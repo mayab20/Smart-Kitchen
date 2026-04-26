@@ -7,11 +7,13 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RecipeSerializer(serializers.ModelSerializer):
-    ingredients = RecipeIngredientSerializer(
+    recipe_ingredients = serializers.PrimaryKeyRelatedField(
         source='recipeingredient_set',
-        many=True
+        many=True,
+        read_only=True
     )
 
     class Meta:
         model = Recipe
         fields = '__all__'
+        extra_kwargs = { 'ingredients': { 'required': False } }
