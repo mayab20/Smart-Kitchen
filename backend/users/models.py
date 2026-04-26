@@ -1,4 +1,5 @@
 from django.db import models
+from items.models import Item
 
 #Helper models 
 class Allergy(models.Model):
