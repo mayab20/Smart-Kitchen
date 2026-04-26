@@ -1,0 +1,20 @@
+<h2>Recipes</h2>
+
+<!-- ADD FORM -->
+<input [(ngModel)]="newRecipe.title" placeholder="Title">
+<input [(ngModel)]="newRecipe.description" placeholder="Description">
+<textarea [(ngModel)]="newRecipe.instructions"></textarea>
+<input type="file" (change)="onFileChange($event, 'image')">
+<input type="file" (change)="onFileChange($event, 'pdf_file')">
+
+<button (click)="addRecipe()">Add</button>
+
+<hr>
+
+<!-- LIST -->
+<div *ngFor="let recipe of recipes">
+  <h3>{{recipe.title}}</h3>
+  <p>{{recipe.description}}</p>
+
+  <button (click)="deleteRecipe(recipe.id)">Delete</button>
+</div>
