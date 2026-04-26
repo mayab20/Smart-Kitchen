@@ -8,10 +8,10 @@ class Recipe(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     instructions = models.TextField()
-    image = models.ImageField(upload_to='recipes/images/')
-    pdf_file = models.FileField(upload_to='recipes/pdfs/')
+    image = models.ImageField(upload_to='recipes/images/', blank=True, null=True)
+    pdf_file = models.FileField(upload_to='recipes/pdfs/', blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
