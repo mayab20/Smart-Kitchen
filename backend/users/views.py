@@ -1,5 +1,5 @@
 from rest_framework import generics
-from .serializers import UserSerializer
+from .serializers import UserSerializer, EmailUpdateSerializer,PasswordUpdateSerializer
 from .models import User
 from rest_framework.permissions import IsAuthenticated
 
@@ -15,10 +15,23 @@ class UserCreateView(generics.CreateAPIView):
   serializer_class= UserSerializer
   permission_classes= [IsAuthenticated]
 
-class UserProfileUpdateView(generics.UpdateAPIView):
+class ProfileUpdateView(generics.UpdateAPIView):
   serializer_class=UserSerializer
   permission_classes= [IsAuthenticated]
 
   def get_object(self):
     return self.request.user
   
+class EmailUpdateView(generics.UpdateAPIView):
+  serializer_class=EmailUpdateSerializer
+  permission_classes= [IsAuthenticated]
+
+  def get_object(self):
+    return self.request.user
+  
+class PasswordUpdateView(generics.UpdateAPIView):
+  serializer_class=PasswordUpdateSerializer
+  permission_classes= [IsAuthenticated]
+
+  def get_object(self):
+    return self.request.user
