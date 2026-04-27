@@ -1,11 +1,13 @@
 from rest_framework import serializers
-from items.serializers import ItemSerializer
-from users.serializers import UserSerializer
 from .models import Pantry
 
 class PantrySerializer(serializers.ModelSerializer):
-  item=ItemSerializer()
-  user=UserSerializer()
   class Meta:
-    model=Pantry
-    fields='__all__'
+    model = Pantry
+    fields = "__all__"
+    read_only_fields = ["user", "created_at", "updated_at"]
+
+  def create(self, validated_data):
+    request = self.context["request"]
+    return Pantry.objects.create(user=request.user, **validated_data)
+

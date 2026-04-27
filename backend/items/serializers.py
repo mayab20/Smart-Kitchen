@@ -1,7 +1,15 @@
 from rest_framework import serializers
-from .models import Item 
+from .models import Item  
 
 class ItemSerializer(serializers.ModelSerializer):
   class Meta:
-    model=Item
-    fields='__all__'
+      model = Item
+      fields = [
+          "id",
+          "name",
+          "category",
+          "unit",
+          "created_at",
+          "updated_at",
+      ]
+      read_only_fields = ["created_at", "updated_at"]
