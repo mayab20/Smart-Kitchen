@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from items.models import Item
 
 #Helper models 
@@ -22,26 +23,63 @@ class Cuisine(models.Model):
     def __str__(self):
         return self.name
 
-#user model
-class User(models.Model):
-  class Sex(models.TextChoices):
-    MALE = 'MALE', 'Male'
-    FEMALE = 'FEMALE', 'Female'
 
-  class Role(models.TextChoices):
-    ADMIN = 'ADMIN', 'Admin'
-    USER='USER','User'
+#profile model
+class Profile(models.Model):
 
-  name=models.CharField(max_length=100)
-  email=models.EmailField(unique=True)  
-  password=models.CharField(max_length=100)
-  birthdate=models.DateField()
-  sex=Sex.choices
-  allergies=models.ManyToManyField(Allergy,blank=True)
-  dietary_preferences=models.ManyToManyField(DietaryPreference, blank=True)
-  favorite_cuisine=models.ManyToManyField(Cuisine,blank=True)
-  disliked_ingredients=models.ManyToManyField(Item, blank=True)
-  role=Role.choices
+    class Sex(models.TextChoices):
+        MALE = 'MALE', 'Male'
+        FEMALE = 'FEMALE', 'Female'
 
-  def __str__(self):
-    return self.name
+    class Role(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin'
+        USER = 'USER', 'User'
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+
+    birthdate = models.DateField()
+
+    sex = models.CharField(
+        max_length=10,
+        choices=Sex.choices
+    )
+
+    role = models.CharField(
+        max_length=10,
+        choices=Role.choices,
+        default=Role.USER
+    )
+
+    allergies = models.ManyToManyField(
+        Allergy,
+        blank=True,
+        related_name="profiles"
+    )
+
+    dietary_preferences = models.ManyToManyField(
+        DietaryPreference,
+        blank=True,
+        related_name="profiles"
+    )
+
+    favorite_cuisines = models.ManyToManyField(
+        Cuisine,
+        blank=True,
+        related_name="profiles"
+    )
+
+    disliked_ingredients = models.ManyToManyField(
+        Item,
+        blank=True,
+        related_name="profiles_who_dislike"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
