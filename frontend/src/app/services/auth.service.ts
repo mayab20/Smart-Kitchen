@@ -11,11 +11,11 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   signup(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register/`, { username, password });
+    return this.http.post(`${this.apiUrl}/users/register/`, { username, password });
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login/`, { username, password }, { withCredentials: true }).pipe(
+    return this.http.post(`${this.apiUrl}/users/login/`, { username, password }, { withCredentials: true }).pipe(
       tap((response: any) => {
         this.accessToken = response.access;
       })
@@ -23,7 +23,7 @@ export class AuthService {
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/logout/`, {}, { withCredentials: true }).pipe(
+    return this.http.post(`${this.apiUrl}/users/logout/`, {}, { withCredentials: true }).pipe(
       tap(() => {
         this.accessToken = null;
       })
