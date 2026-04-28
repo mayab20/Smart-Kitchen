@@ -28,4 +28,12 @@ export class RecipeService {
   deleteRecipe(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}${id}/`);
   }
+
+  updateRecipe(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${id}/`, data);
+  }
+
+  getItems(): Observable<any[]> {
+  return this.http.get<any[]>('http://127.0.0.1:8000/api/items/');
+}
 }
