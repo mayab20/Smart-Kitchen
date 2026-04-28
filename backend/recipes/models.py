@@ -40,3 +40,4 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=50, blank=False)
+    unit = models.CharField(max_length=20, blank=True, default='')

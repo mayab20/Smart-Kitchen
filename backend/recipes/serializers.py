@@ -3,10 +3,11 @@ from .models import Recipe, RecipeIngredient
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     ingredient_name = serializers.ReadOnlyField(source='ingredient.name')
+    ingredient_unit = serializers.ReadOnlyField(source='ingredient.get_unit_display')
 
     class Meta:
         model = RecipeIngredient
-        fields = ['id', 'ingredient', 'ingredient_name', 'quantity']
+        fields = ['id', 'ingredient', 'ingredient_name', 'quantity', 'unit', 'ingredient_unit']
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, required=False)

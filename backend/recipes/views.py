@@ -29,11 +29,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for item in ingredients_data or []:
             ingredient_id = item.get('ingredient')
             quantity = item.get('quantity', '')
+            unit = item.get('unit', '')
             if ingredient_id:
                 RecipeIngredient.objects.create(
                     recipe=recipe,
                     ingredient_id=ingredient_id,
-                    quantity=quantity
+                    quantity=quantity,
+                    unit=unit
                 )
 
     def create(self, request, *args, **kwargs):

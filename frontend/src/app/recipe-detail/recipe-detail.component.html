@@ -19,7 +19,7 @@
 
 <ul>
   <li *ngFor="let ing of recipe.recipe_ingredients">
-    {{ ing.ingredient_name }} - {{ ing.quantity }}
+    {{ ing.ingredient_name }} - {{ ing.quantity }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
   </li>
 </ul>
 

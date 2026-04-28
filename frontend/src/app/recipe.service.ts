@@ -11,7 +11,7 @@ export interface Recipe {
   instructions?: string;
   image?: string | File | null;
   pdf_file?: string | File | null;
-  recipe_ingredients?: Array<{ingredient: number; quantity: string}>;
+  recipe_ingredients?: Array<{ingredient: number; quantity: string; unit?: string}>;
 }
 
 @Injectable({
