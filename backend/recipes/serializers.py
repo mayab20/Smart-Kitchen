@@ -2,12 +2,15 @@ from rest_framework import serializers
 from .models import Recipe, RecipeIngredient
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
+    ingredient_name = serializers.ReadOnlyField(source='ingredient.name')
+
     class Meta:
         model = RecipeIngredient
-        fields = '__all__'
+        fields = ['id', 'ingredient', 'ingredient_name', 'quantity']
 
 class RecipeSerializer(serializers.ModelSerializer):
-    recipe_ingredients = serializers.PrimaryKeyRelatedField(
+    ingredients = serializers.StringRelatedField(many=True, read_only=True)
+    recipe_ingredients = RecipeIngredientSerializer(
         source='recipeingredient_set',
         many=True,
         read_only=True
@@ -16,4 +19,3 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = '__all__'
-        extra_kwargs = { 'ingredients': { 'required': False } }
