@@ -29,16 +29,39 @@ export class RecipeDetailComponent implements OnInit {
     });
   }
 
-  getImageUrl(imagePath: string | null): string {
-    if (!imagePath) {
-      return '';
+  getImageUrl(imagePath: string | null, category: string): string {
+    if (imagePath) {
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      if (imagePath.startsWith('/')) {
+        return imagePath;
+      }
+      return `http://127.0.0.1:8000/${imagePath}`;
     }
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
+    return this.getDefaultImage(category);
+  }
+
+  getPdfUrl(pdfPath: string): string {
+    if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
+      return pdfPath;
     }
-    if (imagePath.startsWith('/')) {
-      return imagePath;
+    if (pdfPath.startsWith('/')) {
+      return pdfPath;
     }
-    return `http://127.0.0.1:8000/${imagePath}`;
+    return `http://127.0.0.1:8000/${pdfPath}`;
+  }
+
+  private getDefaultImage(category: string): string {
+    const defaults: Record<string, string> = {
+      SALAD: '/images/default-salad.svg',
+      SOUP: '/images/default-soup.svg',
+      APPETIZER: '/images/default-appetizer.svg',
+      MAIN: '/images/default-main.svg',
+      DESSERT: '/images/default-dessert.svg',
+      DRINK: '/images/default-drink.svg',
+      OTHER: '/images/default-other.svg'
+    };
+    return defaults[category] || defaults['OTHER'];
   }
 }

@@ -7,7 +7,7 @@
 <div *ngFor="let recipe of recipes" class="card">
   <h3>{{ recipe.title }}</h3>
 
-  <img [src]="getImageUrl(recipe.image)" alt="Recipe Image">
+  <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
 
   <p>{{ recipe.description }}</p>
 

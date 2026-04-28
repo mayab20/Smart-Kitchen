@@ -6,7 +6,7 @@
   <p><strong>Servings:</strong> {{ recipe.servings }}</p>
 
   <!-- IMAGE -->
-  <img [src]="getImageUrl(recipe.image)" alt="Recipe Image">
+  <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
 
   <p>{{recipe.description}}</p>
 
@@ -14,7 +14,7 @@
   <p>{{recipe.instructions}}</p>
 
   <!-- PDF -->
-  <a [href]="recipe.pdf_file" target="_blank">📄 View PDF</a>
+  <a *ngIf="recipe.pdf_file" [href]="getPdfUrl(recipe.pdf_file)" target="_blank">📄 View PDF</a>
   <h3>Ingredients</h3>
 
 <ul>
