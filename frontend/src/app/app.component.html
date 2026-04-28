@@ -4,6 +4,11 @@
   <div class="links">
     <a routerLink="/">Home</a>
     <a routerLink="/add">Add Recipe</a>
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/login">Logout</a>
+    } @else {
+      <a routerLink="/signup">Sign Up</a>
+    }
   </div>
 </nav>
 
