@@ -3,7 +3,7 @@
   <h2>{{recipe.title}}</h2>
 
   <!-- IMAGE -->
-  <img [src]="recipe.image" alt="Recipe Image">
+  <img [src]="getImageUrl(recipe.image)" alt="Recipe Image">
 
   <p>{{recipe.description}}</p>
 

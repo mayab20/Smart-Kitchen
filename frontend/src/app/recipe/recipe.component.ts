@@ -55,4 +55,17 @@ export class RecipesComponent implements OnInit {
       this.loadRecipes();
     });
   }
+
+   getImageUrl(imagePath: string | null): string {
+    if (!imagePath) {
+      return '';
+    }
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    if (imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    return `http://127.0.0.1:8000/${imagePath}`;
+  }
 }

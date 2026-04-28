@@ -7,11 +7,7 @@
 <div *ngFor="let recipe of recipes" class="card">
   <h3>{{ recipe.title }}</h3>
 
-  <img 
-    *ngIf="recipe.image"
-    [src]="'http://127.0.0.1:8000' + recipe.image"
-    width="200"
-  >
+  <img [src]="getImageUrl(recipe.image)" alt="Recipe Image">
 
   <p>{{ recipe.description }}</p>
 
