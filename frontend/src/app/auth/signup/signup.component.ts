@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './signup.component.html',
+  styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
-
   username = '';
   password = '';
   errorMessage = '';
@@ -22,10 +22,9 @@ export class SignupComponent {
       next: () => {
         this.router.navigate(['/login']);
       },
-      error: () => {
-        this.errorMessage = 'Signup failed. Username may already be taken.';
-      }
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Signup failed. Please try again.';
+      },
     });
   }
-
 }
