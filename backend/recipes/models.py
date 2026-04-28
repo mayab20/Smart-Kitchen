@@ -1,11 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-class Ingredient(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
+from items.models import Item
 
 
 class Recipe(models.Model):
@@ -18,7 +13,7 @@ class Recipe(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     ingredients = models.ManyToManyField(
-        Ingredient,
+        Item,
         through='RecipeIngredient'
     )
 
@@ -28,5 +23,5 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=50, blank=True)
