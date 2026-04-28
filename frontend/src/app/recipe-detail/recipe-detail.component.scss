@@ -1,0 +1,19 @@
+.detail-container {
+  max-width: 700px;
+  margin: auto;
+  text-align: center;
+
+  img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    margin: 15px 0;
+    border-radius: 10px;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 10px;
+    color: blue;
+  }
+}
