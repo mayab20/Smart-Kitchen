@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RecipeService } from '../recipe.service';
+import { RecipeService } from '../services/recipe.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -33,7 +33,7 @@ export class RecipesComponent implements OnInit {
 }
 
   loadRecipes() {
-    this.recipeService.getRecipes().subscribe(data => {
+    this.recipeService.getRecipes().subscribe((data: any[]) => {
       this.recipes = data;
     });
   }
