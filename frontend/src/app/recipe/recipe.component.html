@@ -1,20 +1,19 @@
 <h2>Recipes</h2>
 
-<!-- ADD FORM -->
-<input [(ngModel)]="newRecipe.title" placeholder="Title">
-<input [(ngModel)]="newRecipe.description" placeholder="Description">
-<textarea [(ngModel)]="newRecipe.instructions"></textarea>
-<input type="file" (change)="onFileChange($event, 'image')">
-<input type="file" (change)="onFileChange($event, 'pdf_file')">
+<div *ngIf="recipes.length === 0">
+  No recipes found.
+</div>
 
-<button (click)="addRecipe()">Add</button>
+<div *ngFor="let recipe of recipes" class="card">
+  <h3>{{ recipe.title }}</h3>
 
-<hr>
+  <img 
+    *ngIf="recipe.image"
+    [src]="'http://127.0.0.1:8000' + recipe.image"
+    width="200"
+  >
 
-<!-- LIST -->
-<div *ngFor="let recipe of recipes">
-  <h3>{{recipe.title}}</h3>
-  <p>{{recipe.description}}</p>
+  <p>{{ recipe.description }}</p>
 
-  <button (click)="deleteRecipe(recipe.id)">Delete</button>
+  <button [routerLink]="['/recipe', recipe.id]">View</button>
 </div>
