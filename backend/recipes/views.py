@@ -3,10 +3,12 @@ from .models import Recipe
 from .serializers import RecipeSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth/auth.service';
 
 export interface Recipe {
   id?: number;
@@ -15,25 +16,29 @@ export class RecipeService {
 
   private apiUrl = 'http://127.0.0.1:8000/api/recipes/';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
+
+  private get headers() {
+    return { headers: { Authorization: `Bearer ${this.authService.getAccessToken()}` } };
+  }
 
   getRecipes(): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(this.apiUrl);
   }
 
   addRecipe(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+    return this.http.post(this.apiUrl, data, this.headers);
   }
 
   deleteRecipe(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}${id}/`);
+    return this.http.delete(`${this.apiUrl}${id}/`, this.headers);
   }
 
   updateRecipe(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}${id}/`, data);
+    return this.http.put(`${this.apiUrl}${id}/`, data, this.headers);
   }
 
   getItems(): Observable<any[]> {
-  return this.http.get<any[]>('http://127.0.0.1:8000/api/items/');
-}
+    return this.http.get<any[]>('http://127.0.0.1:8000/api/items/');
+  }
 }
