@@ -5,7 +5,7 @@
     <a routerLink="/">Home</a>
     <a routerLink="/add">Add Recipe</a>
     @if (authService.isLoggedIn()) {
-      <a routerLink="/login">Logout</a>
+      <a (click)="onLogout()" style="cursor:pointer">Logout</a>
     } @else {
       <a routerLink="/signup">Sign Up</a>
     }
