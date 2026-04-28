@@ -4,6 +4,14 @@
   <div class="links">
     <a routerLink="/">Home</a>
     <a routerLink="/add">Add Recipe</a>
+<<<<<<< HEAD
+=======
+    @if (authService.isLoggedIn()) {
+      <a (click)="onLogout()" style="cursor:pointer">Logout</a>
+    } @else {
+      <a routerLink="/signup">Sign Up</a>
+    }
+>>>>>>> b79390174dfbcc4df893cab4adaee3677bbebf74
   </div>
 </nav>
 
