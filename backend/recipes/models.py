@@ -7,6 +7,7 @@ class Recipe(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     instructions = models.TextField()
+    servings = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='recipes/images/', blank=True, null=True)
     pdf_file = models.FileField(upload_to='recipes/pdfs/', blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)

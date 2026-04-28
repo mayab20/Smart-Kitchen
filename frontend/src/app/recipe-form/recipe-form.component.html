@@ -5,6 +5,8 @@
 
   <input [(ngModel)]="recipe.description" placeholder="Description">
 
+  <input type="number" [(ngModel)]="recipe.servings" placeholder="Servings" min="1">
+
   <textarea [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
 
   <label>Image:</label>

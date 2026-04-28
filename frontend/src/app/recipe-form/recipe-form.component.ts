@@ -16,6 +16,7 @@ export class RecipeFormComponent implements OnInit {
   recipe: any = {
     title: '',
     description: '',
+    servings: 1,
     instructions: '',
     image: null,
     pdf_file: null
