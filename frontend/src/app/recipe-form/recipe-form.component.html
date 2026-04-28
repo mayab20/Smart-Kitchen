@@ -1,0 +1,28 @@
+<div class="form-container">
+  <h2>{{ isEditMode ? 'Edit Recipe' : 'Add Recipe' }}</h2>
+
+  <input [(ngModel)]="recipe.title" placeholder="Title">
+
+  <input [(ngModel)]="recipe.description" placeholder="Description">
+
+  <textarea [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
+
+  <label>Image:</label>
+  <input type="file" (change)="onFileChange($event, 'image')">
+
+  <label>PDF:</label>
+  <input type="file" (change)="onFileChange($event, 'pdf_file')">
+
+  <h3>Select Ingredients</h3>
+
+<div *ngFor="let item of items">
+  <label>
+    <input type="checkbox" (change)="toggleIngredient(item)">
+    {{ item.name }}
+  </label>
+</div>
+
+  <button (click)="submit()">
+    {{ isEditMode ? 'Update' : 'Add' }}
+  </button>
+</div>
