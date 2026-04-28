@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private apiUrl = 'http://localhost:8000/api';
+  private accessToken: string | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -14,16 +15,27 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/token/`, { username, password });
+    return this.http.post(`${this.apiUrl}/login/`, { username, password }, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        this.accessToken = response.access;
+      })
+    );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/logout/`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        this.accessToken = null;
+      })
+    );
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access');
+    return !!this.accessToken;
   }
 
-  logout(): void {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
+  getAccessToken(): string | null {
+    return this.accessToken;
   }
 
 }

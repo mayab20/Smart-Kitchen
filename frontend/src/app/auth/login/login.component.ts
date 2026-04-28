@@ -19,9 +19,7 @@ export class LoginComponent {
 
   onSubmit() {
     this.authService.login(this.username, this.password).subscribe({
-      next: (response) => {
-        localStorage.setItem('access', response.access);
-        localStorage.setItem('refresh', response.refresh);
+      next: () => {
         this.router.navigate(['/']);
       },
       error: () => {

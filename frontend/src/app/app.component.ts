@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 
 @Component({
@@ -12,5 +13,12 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent {
   title = 'frontend';
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private router: Router) {}
+
+  onLogout() {
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: () => this.router.navigate(['/login'])
+    });
+  }
 }
