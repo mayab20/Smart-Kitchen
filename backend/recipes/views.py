@@ -1,18 +1,69 @@
+import json
+
 from rest_framework import viewsets
-from .models import Recipe
-from .serializers import RecipeSerializer
 from rest_framework.response import Response
 from rest_framework import status
+
+from .models import Recipe, RecipeIngredient
+from .serializers import RecipeSerializer
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    
+
+    def _extract_ingredients_data(self, data):
+        ingredients_data = data.pop('ingredients_data', None)
+        if not ingredients_data:
+            return None
+
+        if isinstance(ingredients_data, str):
+            try:
+                ingredients_data = json.loads(ingredients_data)
+            except ValueError:
+                return None
+
+        return ingredients_data
+
+    def _save_ingredients(self, recipe, ingredients_data):
+        recipe.recipeingredient_set.all().delete()
+        for item in ingredients_data or []:
+            ingredient_id = item.get('ingredient')
+            quantity = item.get('quantity', '')
+            if ingredient_id:
+                RecipeIngredient.objects.create(
+                    recipe=recipe,
+                    ingredient_id=ingredient_id,
+                    quantity=quantity
+                )
+
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        
+        data = request.data.copy()
+        ingredients_data = self._extract_ingredients_data(data)
+
+        serializer = self.get_serializer(data=data)
         if not serializer.is_valid():
-            print(serializer.errors)  # 👈 THIS IS IMPORTANT
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        self.perform_create(serializer)
-        return Response(serializer.data)
+
+        recipe = serializer.save()
+        if ingredients_data is not None:
+            self._save_ingredients(recipe, ingredients_data)
+
+        return Response(self.get_serializer(recipe).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+        ingredients_data = self._extract_ingredients_data(data) if 'ingredients_data' in request.data else None
+
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        if not serializer.is_valid():
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        recipe = serializer.save()
+        if ingredients_data is not None:
+            self._save_ingredients(recipe, ingredients_data)
+
+        return Response(self.get_serializer(recipe).data)

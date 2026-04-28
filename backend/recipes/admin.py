@@ -10,7 +10,7 @@ class RecipeIngredientInline(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = [RecipeIngredientInline]
-    fields = ('title', 'description', 'servings', 'instructions', 'image', 'pdf_file', 'created_by')
+    fields = ('title', 'description', 'category', 'servings', 'instructions', 'image', 'pdf_file', 'created_by')
 
 
 # Register your models here.

@@ -4,8 +4,22 @@ from items.models import Item
 
 
 class Recipe(models.Model):
+    class Category(models.TextChoices):
+        SALAD = 'SALAD', 'Salad'
+        SOUP = 'SOUP', 'Soup'
+        APPETIZER = 'APPETIZER', 'Appetizer'
+        MAIN = 'MAIN', 'Main Course'
+        DESSERT = 'DESSERT', 'Dessert'
+        DRINK = 'DRINK', 'Drink'
+        OTHER = 'OTHER', 'Other'
+
     title = models.CharField(max_length=200)
     description = models.TextField()
+    category = models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.OTHER
+    )
     instructions = models.TextField()
     servings = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='recipes/images/', blank=True, null=True)

@@ -6,6 +6,12 @@ export interface Recipe {
   id?: number;
   title: string;
   description: string;
+  category?: string;
+  servings?: number;
+  instructions?: string;
+  image?: string | File | null;
+  pdf_file?: string | File | null;
+  recipe_ingredients?: Array<{ingredient: number; quantity: string}>;
 }
 
 @Injectable({
