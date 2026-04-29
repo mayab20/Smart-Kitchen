@@ -8,7 +8,7 @@ class ItemSerializer(serializers.ModelSerializer):
           "id",
           "name",
           "category",
-          "unit",
+          "allowed_units",
           "created_at",
           "updated_at",
       ]
