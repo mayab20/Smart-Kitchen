@@ -14,6 +14,18 @@ import { RouterLink } from '@angular/router';
 export class RecipesComponent implements OnInit {
 
   recipes: any[] = [];
+  selectedCategory = 'ALL';
+
+  recipeCategories = [
+    { value: 'ALL', label: 'All' },
+    { value: 'SALAD', label: 'Salad' },
+    { value: 'SOUP', label: 'Soup' },
+    { value: 'APPETIZER', label: 'Appetizer' },
+    { value: 'MAIN', label: 'Main Course' },
+    { value: 'DESSERT', label: 'Dessert' },
+    { value: 'DRINK', label: 'Drink' },
+    { value: 'OTHER', label: 'Other' }
+  ];
 
   newRecipe: any = {
     title: '',
@@ -36,6 +48,13 @@ export class RecipesComponent implements OnInit {
     this.recipeService.getRecipes().subscribe((data: any[]) => {
       this.recipes = data;
     });
+  }
+
+  get filteredRecipes() {
+    if (this.selectedCategory === 'ALL') {
+      return this.recipes;
+    }
+    return this.recipes.filter(recipe => recipe.category === this.selectedCategory);
   }
 
   addRecipe() {

@@ -1,10 +1,15 @@
 <h2>Recipes</h2>
 
-<div *ngIf="recipes.length === 0">
+<label for="categoryFilter">Filter by category:</label>
+<select id="categoryFilter" [(ngModel)]="selectedCategory">
+  <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{ cat.label }}</option>
+</select>
+
+<div *ngIf="filteredRecipes.length === 0">
   No recipes found.
 </div>
 
-<div *ngFor="let recipe of recipes" class="card">
+<div *ngFor="let recipe of filteredRecipes" class="card">
   <h3>{{ recipe.title }}</h3>
 
   <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
