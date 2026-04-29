@@ -48,9 +48,32 @@
 
   <h3>Ingredients</h3>
 
-  <div *ngIf="!isEditing">
+  <button *ngIf="!cookMode" type="button" (click)="startCook()">Cook</button>
+
+  <div *ngIf="cookMode" class="cook-panel">
+    <label>Servings:</label>
+    <input type="number" min="1" [(ngModel)]="cookServings">
+    <div *ngIf="cookError" class="error">{{ cookError }}</div>
+    <div *ngIf="cookMessage" class="success">{{ cookMessage }}</div>
     <ul>
       <li *ngFor="let ing of recipe.recipe_ingredients">
+        <span [class.available]="getCookAvailable(ing)" [class.unavailable]="!getCookAvailable(ing)">
+          {{ getCookAvailable(ing) ? '✔' : '✘' }}
+        </span>
+        {{ ing.ingredient_name }} - {{ getScaledQuantity(ing) }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
+        <span class="small">(pantry: {{ ing.pantry_quantity || 0 }})</span>
+      </li>
+    </ul>
+    <button type="button" (click)="confirmCook()">Confirm Cook</button>
+    <button type="button" (click)="cancelCook()">Cancel</button>
+  </div>
+
+  <div *ngIf="!cookMode && !isEditing">
+    <ul>
+      <li *ngFor="let ing of recipe.recipe_ingredients">
+        <span [class.available]="ing.has_pantry" [class.unavailable]="!ing.has_pantry">
+          {{ ing.has_pantry ? '✔' : '✘' }}
+        </span>
         {{ ing.ingredient_name }} - {{ ing.quantity }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
       </li>
     </ul>

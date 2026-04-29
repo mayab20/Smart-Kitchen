@@ -39,7 +39,7 @@ export class RecipeService {
   }
 
   getRecipe(id: number): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.apiUrl}${id}/`);
+    return this.http.get<Recipe>(`${this.apiUrl}${id}/`, this.headers);
   }
 
   addRecipe(data: any): Observable<any> {
@@ -52,6 +52,10 @@ export class RecipeService {
 
   updateRecipe(id: number, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}${id}/`, data, this.headers);
+  }
+
+  cookRecipe(id: number, servings: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}${id}/cook/`, { servings }, this.headers);
   }
 
   getItems(): Observable<any[]> {

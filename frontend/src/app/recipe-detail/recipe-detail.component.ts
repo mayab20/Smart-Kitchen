@@ -19,6 +19,10 @@ export class RecipeDetailComponent implements OnInit {
   isEditing = false;
   removeImage = false;
   removePdf = false;
+  cookMode = false;
+  cookServings = 1;
+  cookMessage = '';
+  cookError = '';
   selectedIngredients: any[] = [];
   suggestions: any[] = [];
   ingredientSearch = '';
@@ -166,6 +170,66 @@ export class RecipeDetailComponent implements OnInit {
   clearPdf() {
     this.recipe.pdf_file = null;
     this.removePdf = true;
+  }
+
+  startCook() {
+    this.cookMode = true;
+    this.cookServings = this.recipe?.servings || 1;
+    this.cookError = '';
+    this.cookMessage = '';
+  }
+
+  cancelCook() {
+    this.cookMode = false;
+    this.cookError = '';
+    this.cookMessage = '';
+  }
+
+  private parseQuantity(value: string): number {
+    if (value === null || value === undefined) {
+      return 0;
+    }
+    const match = String(value).trim().match(/^([0-9]+(?:[.,][0-9]+)?)/);
+    if (!match) {
+      return 0;
+    }
+    return parseFloat(match[1].replace(',', '.'));
+  }
+
+  getScaledQuantity(ing: any): string {
+    if (!this.recipe?.servings) {
+      return ing.quantity || '0';
+    }
+    const baseQty = this.parseQuantity(ing.quantity);
+    if (!baseQty) {
+      return ing.quantity || '0';
+    }
+    const scaled = baseQty * (this.cookServings / this.recipe.servings);
+    return scaled.toFixed(2);
+  }
+
+  getCookAvailable(ing: any): boolean {
+    const needed = this.parseQuantity(ing.quantity) * (this.cookServings / (this.recipe?.servings || 1));
+    return (ing.pantry_quantity || 0) >= needed;
+  }
+
+  confirmCook() {
+    this.cookError = '';
+    this.cookMessage = '';
+    this.recipeService.cookRecipe(this.recipe.id, this.cookServings).subscribe({
+      next: response => {
+        this.cookMessage = response.detail || 'Cooked successfully';
+        this.cookMode = false;
+        this.recipeService.getRecipe(this.recipe.id).subscribe(recipe => {
+          this.recipe = recipe;
+          this.setupSelectedIngredients();
+        });
+      },
+      error: err => {
+        console.error('Cook failed:', err);
+        this.cookError = err.error?.detail || 'Unable to cook with current pantry stock.';
+      }
+    });
   }
 
   editRecipe() {
