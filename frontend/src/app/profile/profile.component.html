@@ -1,0 +1,37 @@
+<div class="profile-container">
+
+  <div class="profile-header">
+    <div class="avatar">👤</div>
+    <div class="profile-actions">
+      <button class="logout-btn" (click)="onLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>My Recipes</h3>
+
+    @if (myRecipes.length === 0) {
+      <p class="empty">You haven't created any recipes yet. <a routerLink="/add">Add one</a></p>
+    }
+
+    <div class="recipes-grid">
+      @for (recipe of myRecipes; track recipe.id) {
+        <div class="recipe-card">
+          @if (recipe.image) {
+            <img [src]="recipe.image" [alt]="recipe.title" />
+          }
+          <div class="recipe-card-body">
+            <h4>{{ recipe.title }}</h4>
+            <p>{{ recipe.description }}</p>
+            <div class="recipe-card-actions">
+              <a [routerLink]="['/recipe', recipe.id]">View</a>
+              <a [routerLink]="['/edit', recipe.id]">Edit</a>
+              <button (click)="deleteRecipe(recipe.id)">Delete</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

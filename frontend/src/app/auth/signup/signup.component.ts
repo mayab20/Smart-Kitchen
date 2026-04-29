@@ -4,13 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-signup',
   standalone: true,
   imports: [FormsModule, RouterLink],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './signup.component.html',
+  styleUrl: './signup.component.scss',
 })
-export class LoginComponent {
+export class SignupComponent {
   username = '';
   password = '';
   errorMessage = '';
@@ -18,12 +18,12 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.login(this.username, this.password).subscribe({
+    this.authService.signup(this.username, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       },
-      error: () => {
-        this.errorMessage = 'Invalid username or password.';
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Signup failed. Please try again.';
       },
     });
   }

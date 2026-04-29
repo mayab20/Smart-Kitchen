@@ -1,10 +1,17 @@
 <div class="form-container">
   <h2>{{ isEditMode ? 'Edit Recipe' : 'Add Recipe' }}</h2>
 
-  <input [(ngModel)]="recipe.title" placeholder="Title">
+  <div class="form-group">
+    <label>Title</label>
+    <input [(ngModel)]="recipe.title" name="title" placeholder="Recipe title" />
+  </div>
 
-  <input [(ngModel)]="recipe.description" placeholder="Description">
+  <div class="form-group">
+    <label>Description</label>
+    <input [(ngModel)]="recipe.description" name="description" placeholder="Short description" />
+  </div>
 
+<<<<<<< HEAD
   <label>Category:</label>
   <select [(ngModel)]="recipe.category">
     <option *ngFor="let category of recipeCategories" [value]="category.value">
@@ -15,15 +22,50 @@
   <input type="number" [(ngModel)]="recipe.servings" placeholder="Servings" min="1">
 
   <textarea [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
+=======
+  <div class="form-group">
+    <label>Instructions</label>
+    <textarea [(ngModel)]="recipe.instructions" name="instructions" placeholder="Step by step instructions"></textarea>
+  </div>
+>>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
 
-  <label>Image:</label>
-  <input type="file" (change)="onFileChange($event, 'image')">
+  <div class="form-group">
+    <label>Image</label>
+    <input type="file" (change)="onFileChange($event, 'image')" />
+  </div>
 
-  <label>PDF:</label>
-  <input type="file" (change)="onFileChange($event, 'pdf_file')">
+  <div class="form-group">
+    <label>PDF</label>
+    <input type="file" (change)="onFileChange($event, 'pdf_file')" />
+  </div>
 
-  <h3>Select Ingredients</h3>
+  <!-- Ingredient Search -->
+  <div class="form-group">
+    <label>Ingredients</label>
+    <div class="search-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="ingredientSearch"
+        name="ingredientSearch"
+        placeholder="Search ingredient..."
+        (input)="onSearchInput()"
+        (focus)="showSuggestions = true"
+        (blur)="showSuggestions = false"
+        autocomplete="off"
+      />
+      @if (showSuggestions && suggestions.length > 0) {
+        <ul class="suggestions">
+          @for (s of suggestions; track s.id) {
+            <li (mousedown)="selectIngredient(s)">
+              {{ s.name }} <span>{{ s.category }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
 
+<<<<<<< HEAD
   <div *ngFor="let item of items" class="ingredient-row">
     <label>
       <input
@@ -42,8 +84,34 @@
       class="ingredient-quantity"
     >
   </div>
+=======
+  <!-- Selected Ingredients Tags -->
+  @if (selectedIngredients.length > 0) {
+    <div class="tags">
+      @for (ing of selectedIngredients; track ing.ingredient) {
+        <div class="tag">
+          <span class="tag-name">{{ ing.name }}</span>
+          <input
+            type="number"
+            [(ngModel)]="ing.quantity"
+            [name]="'qty_' + ing.ingredient"
+            placeholder="qty"
+            min="0"
+            step="0.1"
+          />
+          <select [(ngModel)]="ing.unit" [name]="'unit_' + ing.ingredient">
+            @for (unit of ing.allowed_units; track unit) {
+              <option [value]="unit">{{ unit }}</option>
+            }
+          </select>
+          <button type="button" (click)="removeIngredient(ing.ingredient)">✕</button>
+        </div>
+      }
+    </div>
+  }
+>>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
 
-  <button (click)="submit()">
-    {{ isEditMode ? 'Update' : 'Add' }}
+  <button class="submit-btn" (click)="submit()">
+    {{ isEditMode ? 'Update' : 'Add Recipe' }}
   </button>
 </div>

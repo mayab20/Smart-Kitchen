@@ -1,0 +1,33 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
+
+@Injectable({ providedIn: 'root' })
+export class PantryService {
+  private apiUrl = 'http://localhost:8000/api';
+
+  constructor(private http: HttpClient, private authService: AuthService) {}
+
+  private get headers() {
+    return {
+      headers: { Authorization: `Bearer ${this.authService.getAccessToken()}` },
+    };
+  }
+
+  searchItems(query: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/items/?search=${query}`);
+  }
+
+  getPantry(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/pantries/pantry/`, this.headers);
+  }
+
+  addToPantry(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/pantries/pantry/`, data, this.headers);
+  }
+
+  deleteFromPantry(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/pantries/pantry/${id}/`, this.headers);
+  }
+}

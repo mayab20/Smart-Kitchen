@@ -65,10 +65,9 @@ class Item(models.Model):
         default=Category.OTHER
     )
 
-    unit = models.CharField(
-        max_length=10,
-        choices=Unit.choices,
-        default=Unit.NONE
+    allowed_units = models.JSONField(
+        default=list,
+        help_text='List of allowed unit values for this item'
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

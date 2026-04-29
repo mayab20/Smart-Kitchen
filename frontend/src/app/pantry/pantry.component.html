@@ -1,0 +1,88 @@
+<div class="pantry-container">
+
+  <h2>🧺 My Pantry</h2>
+
+  <!-- Add Item Form -->
+  <div class="card">
+    <h3>Add to Pantry</h3>
+    <form (ngSubmit)="addEntry()" class="add-form">
+
+      <div class="form-group search-group">
+        <label>Item</label>
+        <div class="search-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="itemSearch"
+            name="itemSearch"
+            placeholder="Search item..."
+            (input)="onSearchInput()"
+            (focus)="showSuggestions = true"
+            (blur)="showSuggestions = false"
+            autocomplete="off"
+          />
+          @if (showSuggestions && suggestions.length > 0) {
+            <ul class="suggestions">
+              @for (s of suggestions; track s.id) {
+                <li (mousedown)="selectItem(s)">{{ s.name }} <span>{{ s.category }}</span></li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" [(ngModel)]="newEntry.quantity" name="quantity" min="0.1" step="0.1" required />
+      </div>
+
+      <div class="form-group">
+        <label>Unit</label>
+        <select [(ngModel)]="newEntry.unit" name="unit">
+          @for (unit of selectedItemUnits; track unit) {
+            <option [value]="unit">{{ unit }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Expiration Date</label>
+        <input type="date" [(ngModel)]="newEntry.expiration_date" name="expiration_date" required />
+      </div>
+
+      <button type="submit">Add</button>
+
+    </form>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="filter-bar">
+    @for (cat of categories; track cat) {
+      <button
+        [class.active]="selectedCategory === cat"
+        (click)="selectedCategory = cat">
+        {{ cat }}
+      </button>
+    }
+  </div>
+
+  <!-- Pantry List -->
+  <div class="pantry-grid">
+    @for (entry of filteredPantry; track entry.id) {
+      <div class="pantry-card">
+        <div class="pantry-card-header">
+          <span class="item-name">{{ getItemName(entry.item) }}</span>
+          <span class="category-badge">{{ getItemCategory(entry.item) }}</span>
+        </div>
+        <div class="pantry-card-body">
+          <span>{{ entry.quantity }} {{ entry.unit }}</span>
+          <span class="expiry">Expires: {{ entry.expiration_date }}</span>
+        </div>
+        <button class="delete-btn" (click)="deleteEntry(entry.id)">Remove</button>
+      </div>
+    }
+    @empty {
+      <p class="empty">No items found in this category.</p>
+    }
+  </div>
+
+</div>

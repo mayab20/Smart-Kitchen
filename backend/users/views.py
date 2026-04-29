@@ -5,13 +5,10 @@ from .models import Profile
 from .serializers import ProfileSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-<<<<<<< HEAD
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-=======
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
->>>>>>> b79390174dfbcc4df893cab4adaee3677bbebf74
 from django.contrib.auth.models import User
 from .serializers import EmailUpdateSerializer
 from .serializers import PasswordUpdateSerializer
