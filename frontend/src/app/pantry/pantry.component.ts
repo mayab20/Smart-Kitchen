@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PantryService } from '../services/pantry.service';
@@ -23,32 +23,65 @@ export class PantryComponent implements OnInit {
   showSuggestions = false;
   private searchSubject = new Subject<string>();
 
-  newEntry = {
-    item: '' as any,
+  // Use number | null for type safety
+  newEntry: {
+    item: number | null;
+    quantity: number;
+    unit: string;
+    expiration_date: string;
+  } = {
+    item: null,
     quantity: 1,
     unit: 'NONE',
     expiration_date: '',
   };
 
   units = [
-    'PCS', 'PACK', 'BOX', 'BAG', 'BOTTLE', 'CAN', 'JAR',
-    'G', 'KG', 'ML', 'L', 'TSP', 'TBSP', 'CUP', 'CUPS',
-    'SLICE', 'SLICES', 'LEAVES', 'CLOVE', 'CLOVES', 'PINCH', 'NONE',
+    'PCS',
+    'PACK',
+    'BOX',
+    'BAG',
+    'BOTTLE',
+    'CAN',
+    'JAR',
+    'G',
+    'KG',
+    'ML',
+    'L',
+    'TSP',
+    'TBSP',
+    'CUP',
+    'CUPS',
+    'SLICE',
+    'SLICES',
+    'LEAVES',
+    'CLOVE',
+    'CLOVES',
+    'PINCH',
+    'NONE',
   ];
 
-  constructor(private pantryService: PantryService) {}
+  // Error message for user feedback
+  addError: string | null = null;
+
+  constructor(
+    private pantryService: PantryService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.loadPantry();
 
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.pantryService.searchItems(query))
-    ).subscribe({
-      next: data => this.suggestions = data,
-      error: err => console.error('Search failed:', err)
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => this.pantryService.searchItems(query))
+      )
+      .subscribe({
+        next: (data) => (this.suggestions = data),
+        error: (err) => console.error('Search failed:', err),
+      });
   }
 
   onSearchInput() {
@@ -61,15 +94,20 @@ export class PantryComponent implements OnInit {
 
   loadPantry() {
     this.pantryService.getPantry().subscribe((data) => {
-      this.pantryItems = data;
-      const cats = [...new Set(data.map((e: any) => e.item_category).filter(Boolean))] as string[];
+      this.pantryItems = [...data];
+      const cats = [
+        ...new Set(data.map((e: any) => e.item.category).filter(Boolean)),
+      ] as string[];
       this.categories = ['ALL', ...cats];
+      this.cdr.detectChanges();
     });
   }
 
   get filteredPantry() {
     if (this.selectedCategory === 'ALL') return this.pantryItems;
-    return this.pantryItems.filter(entry => entry.item_category === this.selectedCategory);
+    return this.pantryItems.filter(
+      (entry) => entry.category === this.selectedCategory
+    );
   }
 
   selectItem(item: any) {
@@ -79,22 +117,48 @@ export class PantryComponent implements OnInit {
     this.suggestions = [];
     this.showSuggestions = false;
     this.selectedItemUnits = item.allowed_units ?? [];
+    this.addError = null; // Clear error if user selects an item
   }
 
-  getItemName(itemId: number): string {
-    return this.pantryItems.find(e => e.item === itemId)?.item_name ?? 'Unknown';
-  }
+  // getItemName(itemId: number): string {
+  //   return (
+  //     this.pantryItems.find((e) => e.item === itemId)? name ?? 'Unknown'
+  //   );
+  // }
 
-  getItemCategory(itemId: number): string {
-    return this.pantryItems.find(e => e.item === itemId)?.item_category ?? '';
-  }
+  // getItemCategory(itemId: number): string {
+  //   return this.pantryItems.find((e) => e.item === itemId)?.category ?? '';
+  // }
 
   addEntry() {
-    this.pantryService.addToPantry(this.newEntry).subscribe(() => {
-      this.loadPantry();
-      this.newEntry = { item: '', quantity: 1, unit: 'NONE', expiration_date: '' };
-      this.itemSearch = '';
-      this.selectedItemUnits = [];
+    // Prevent submission if item is not selected
+    if (!this.newEntry.item) {
+      this.addError = 'Please select an item from the suggestions.';
+      return;
+    }
+
+    if (!this.newEntry.expiration_date) {
+      this.addError = 'Please enter an expiration date.';
+      return;
+    }
+
+    this.pantryService.addToPantry(this.newEntry).subscribe({
+      next: () => {
+        this.loadPantry();
+        this.newEntry = {
+          item: null,
+          quantity: 1,
+          unit: 'NONE',
+          expiration_date: '',
+        };
+        this.itemSearch = '';
+        this.selectedItemUnits = [];
+        this.addError = null;
+      },
+      error: (err) => {
+        this.addError = 'Failed to add item. Please try again.';
+        console.error(err);
+      },
     });
   }
 

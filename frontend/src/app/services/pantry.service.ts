@@ -16,7 +16,7 @@ export class PantryService {
   }
 
   searchItems(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/items/?search=${query}`);
+    return this.http.get<any[]>(`${this.apiUrl}/items/?search=${query}`, this.headers);
   }
 
   getPantry(): Observable<any[]> {
