@@ -90,13 +90,13 @@ export class RecipesComponent implements OnInit {
 
   private getDefaultImage(category: string): string {
     const defaults: Record<string, string> = {
-      SALAD: '/images/default-salad.svg',
-      SOUP: '/images/default-soup.svg',
-      APPETIZER: '/images/default-appetizer.svg',
-      MAIN: '/images/default-main.svg',
-      DESSERT: '/images/default-dessert.svg',
-      DRINK: '/images/default-drink.svg',
-      OTHER: '/images/default-other.svg'
+      SALAD: '/images/salad-svgrepo-com.svg',
+      SOUP: '/images/soup-svgrepo-com.svg',
+      APPETIZER: '/images/starter-svgrepo-com.svg',
+      MAIN: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
+      DRINK: '/images/drink-soft-drink-svgrepo-com.svg',
+      OTHER: '/images/oden-svgrepo-com.svg'
     };
     return defaults[category] || defaults['OTHER'];
   }
