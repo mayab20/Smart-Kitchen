@@ -68,6 +68,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         data = request.data.copy()
+        if data.get('image', None) == '':
+            data['image'] = None
+        if data.get('pdf_file', None) == '':
+            data['pdf_file'] = None
         ingredients_data = self._extract_ingredients_data(data) if 'ingredients_data' in request.data else None
 
         serializer = self.get_serializer(instance, data=data, partial=partial)

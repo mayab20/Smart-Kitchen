@@ -1,26 +1,79 @@
 <div *ngIf="recipe" class="detail-container">
 
-  <h2>{{recipe.title}}</h2>
+  <div class="buttons">
+    <button *ngIf="!isEditing" (click)="editRecipe()">Edit</button>
+    <button *ngIf="!isEditing" (click)="deleteRecipe()">Delete</button>
+    <button *ngIf="isEditing" (click)="saveRecipe()">Save</button>
+    <button *ngIf="isEditing" (click)="cancelEdit()">Cancel</button>
+  </div>
 
-  <p><strong>Category:</strong> {{ recipe.category }}</p>
-  <p><strong>Servings:</strong> {{ recipe.servings }}</p>
+  <h2 *ngIf="!isEditing">{{recipe.title}}</h2>
+  <input *ngIf="isEditing" [(ngModel)]="recipe.title" placeholder="Title">
+
+  <p *ngIf="!isEditing"><strong>Category:</strong> {{ getCategoryLabel(recipe.category) }}</p>
+  <select *ngIf="isEditing" [(ngModel)]="recipe.category">
+    <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{cat.label}}</option>
+  </select>
+
+  <p *ngIf="!isEditing"><strong>Servings:</strong> {{ recipe.servings }}</p>
+  <input *ngIf="isEditing" type="number" min="1" [(ngModel)]="recipe.servings" placeholder="Servings">
 
   <!-- IMAGE -->
   <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
+  <div *ngIf="isEditing" class="file-field">
+    <div *ngIf="recipe.image">
+      <button type="button" (click)="clearImage()">Clear image</button>
+    </div>
+    <label>Replace image:</label>
+    <input type="file" (change)="onFileChange($event, 'image')" accept="image/*">
+  </div>
 
-  <p>{{recipe.description}}</p>
+  <p *ngIf="!isEditing">{{recipe.description}}</p>
+  <textarea *ngIf="isEditing" [(ngModel)]="recipe.description" placeholder="Description"></textarea>
 
   <h4>Instructions</h4>
-  <p>{{recipe.instructions}}</p>
+  <p *ngIf="!isEditing">{{recipe.instructions}}</p>
+  <textarea *ngIf="isEditing" [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
 
-  <!-- PDF -->
-  <a *ngIf="recipe.pdf_file" [href]="getPdfUrl(recipe.pdf_file)" target="_blank">📄 View PDF</a>
+  <div *ngIf="recipe.pdf_file">
+    <a [href]="getPdfUrl(recipe.pdf_file)" target="_blank">📄 View PDF</a>
+  </div>
+  <div *ngIf="isEditing" class="file-field">
+    <div *ngIf="recipe.pdf_file">
+      <button type="button" (click)="clearPdf()">Clear PDF</button>
+    </div>
+    <label>Replace PDF:</label>
+    <input type="file" (change)="onFileChange($event, 'pdf_file')" accept="application/pdf">
+  </div>
+
   <h3>Ingredients</h3>
 
-<ul>
-  <li *ngFor="let ing of recipe.recipe_ingredients">
-    {{ ing.ingredient_name }} - {{ ing.quantity }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
-  </li>
-</ul>
+  <div *ngIf="!isEditing">
+    <ul>
+      <li *ngFor="let ing of recipe.recipe_ingredients">
+        {{ ing.ingredient_name }} - {{ ing.quantity }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="isEditing">
+    <div class="ingredient-search">
+      <input type="text" [(ngModel)]="ingredientSearch" (input)="onSearchInput()" placeholder="Search ingredients">
+      <ul *ngIf="suggestions.length > 0" class="suggestions-list">
+        <li *ngFor="let suggestion of suggestions" (click)="selectIngredient(suggestion)">{{ suggestion.name }}</li>
+      </ul>
+    </div>
+
+    <ul>
+      <li *ngFor="let ing of selectedIngredients; let i = index">
+        <strong>{{ing.name}}</strong>
+        <input type="text" [(ngModel)]="ing.quantity" placeholder="Quantity">
+        <select [(ngModel)]="ing.unit">
+          <option *ngFor="let unit of ing.allowed_units" [value]="unit">{{unit}}</option>
+        </select>
+        <button type="button" (click)="removeIngredient(ing.ingredient)">Remove</button>
+      </li>
+    </ul>
+  </div>
 
 </div>

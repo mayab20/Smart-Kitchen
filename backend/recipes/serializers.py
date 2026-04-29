@@ -10,8 +10,8 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ['id', 'ingredient', 'ingredient_name', 'quantity', 'unit', 'ingredient_unit']
 
 class RecipeSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True, required=False)
-    pdf_file = serializers.FileField(use_url=True, required=False)
+    image = serializers.ImageField(use_url=True, required=False, allow_null=True)
+    pdf_file = serializers.FileField(use_url=True, required=False, allow_null=True)
     ingredients = serializers.StringRelatedField(many=True, read_only=True)
     recipe_ingredients = RecipeIngredientSerializer(
         source='recipeingredient_set',
