@@ -18,28 +18,11 @@ export class RecipeFormComponent implements OnInit {
   recipe: any = {
     title: '',
     description: '',
-    category: 'OTHER',
-    servings: 1,
     instructions: '',
     image: null,
-    pdf_file: null,
-    recipe_ingredients: []
+    pdf_file: null
   };
 
-<<<<<<< HEAD
-  recipeCategories = [
-    { value: 'SALAD', label: 'Salad' },
-    { value: 'SOUP', label: 'Soup' },
-    { value: 'APPETIZER', label: 'Appetizer' },
-    { value: 'MAIN', label: 'Main Course' },
-    { value: 'DESSERT', label: 'Dessert' },
-    { value: 'DRINK', label: 'Drink' },
-    { value: 'OTHER', label: 'Other' }
-  ];
-
-  items: any[] = [];
-=======
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
   selectedIngredients: any[] = [];
   suggestions: any[] = [];
   ingredientSearch = '';
@@ -57,31 +40,12 @@ export class RecipeFormComponent implements OnInit {
 
   ngOnInit() {
     this.recipeId = this.route.snapshot.params['id'];
-<<<<<<< HEAD
-    this.recipeService.getItems().subscribe(data => {
-      this.items = data;
-    });
-=======
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
 
     if (this.recipeId) {
       this.isEditMode = true;
       this.recipeService.getRecipes().subscribe(data => {
-<<<<<<< HEAD
-        const found = data.find(r => r.id == this.recipeId);
-        if (found) {
-          this.recipe = found;
-          if (found.recipe_ingredients) {
-            this.selectedIngredients = found.recipe_ingredients.map((ri: any) => ({
-              ingredient: ri.ingredient,
-              quantity: ri.quantity || ''
-            }));
-          }
-        }
-=======
         const found = data.find((r: any) => r.id == this.recipeId);
         if (found) this.recipe = found;
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
       });
     }
 
@@ -128,61 +92,6 @@ export class RecipeFormComponent implements OnInit {
     this.recipe[field] = file;
   }
 
-<<<<<<< HEAD
-  isIngredientSelected(itemId: number) {
-    return this.selectedIngredients.some(i => i.ingredient === itemId);
-  }
-
-  getSelectedIngredient(itemId: number) {
-    return this.selectedIngredients.find(i => i.ingredient === itemId);
-  }
-
-  toggleIngredient(item: any) {
-    const index = this.selectedIngredients.findIndex(i => i.ingredient === item.id);
-
-    if (index > -1) {
-      this.selectedIngredients.splice(index, 1);
-    } else {
-      this.selectedIngredients.push({
-        ingredient: item.id,
-        quantity: ''
-      });
-    }
-  }
-
-  submit() {
-    const formData = new FormData();
-
-    for (let key in this.recipe) {
-      const value = this.recipe[key];
-
-      if (key === 'recipe_ingredients') {
-        continue;
-      }
-
-      if (value === null || value === undefined) {
-        continue;
-      }
-
-      if ((key === 'image' || key === 'pdf_file') && !(value instanceof File)) {
-        continue;
-      }
-
-      formData.append(key, value);
-    }
-
-    formData.append('ingredients_data', JSON.stringify(this.selectedIngredients));
-
-    const request = this.isEditMode
-      ? this.recipeService.updateRecipe(this.recipeId, formData)
-      : this.recipeService.addRecipe(formData);
-
-    request.subscribe(() => {
-      this.router.navigate(['/']);
-    });
-  }
-}
-=======
   submit() {
     const formData = new FormData();
     for (let key in this.recipe) {
@@ -194,4 +103,3 @@ export class RecipeFormComponent implements OnInit {
     });
   }
 }
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7

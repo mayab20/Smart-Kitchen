@@ -11,23 +11,10 @@
     <input [(ngModel)]="recipe.description" name="description" placeholder="Short description" />
   </div>
 
-<<<<<<< HEAD
-  <label>Category:</label>
-  <select [(ngModel)]="recipe.category">
-    <option *ngFor="let category of recipeCategories" [value]="category.value">
-      {{ category.label }}
-    </option>
-  </select>
-
-  <input type="number" [(ngModel)]="recipe.servings" placeholder="Servings" min="1">
-
-  <textarea [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
-=======
   <div class="form-group">
     <label>Instructions</label>
     <textarea [(ngModel)]="recipe.instructions" name="instructions" placeholder="Step by step instructions"></textarea>
   </div>
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
 
   <div class="form-group">
     <label>Image</label>
@@ -65,26 +52,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-  <div *ngFor="let item of items" class="ingredient-row">
-    <label>
-      <input
-        type="checkbox"
-        [checked]="isIngredientSelected(item.id)"
-        (change)="toggleIngredient(item)"
-      >
-      {{ item.name }}
-    </label>
-
-    <input
-      *ngIf="isIngredientSelected(item.id)"
-      type="text"
-      [(ngModel)]="getSelectedIngredient(item.id).quantity"
-      placeholder="Quantity"
-      class="ingredient-quantity"
-    >
-  </div>
-=======
   <!-- Selected Ingredients Tags -->
   @if (selectedIngredients.length > 0) {
     <div class="tags">
@@ -109,7 +76,6 @@
       }
     </div>
   }
->>>>>>> 3512070fa2b056b188bec59d741cc7d9e89be4b7
 
   <button class="submit-btn" (click)="submit()">
     {{ isEditMode ? 'Update' : 'Add Recipe' }}
