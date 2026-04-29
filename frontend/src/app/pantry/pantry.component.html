@@ -70,8 +70,8 @@
     @for (entry of filteredPantry; track entry.id) {
       <div class="pantry-card">
         <div class="pantry-card-header">
-          <span class="item-name">{{ getItemName(entry.item) }}</span>
-          <span class="category-badge">{{ getItemCategory(entry.item) }}</span>
+          <span class="item-name">{{ entry.item_name }}</span>
+          <span class="category-badge">{{ entry.item_category }}</span>
         </div>
         <div class="pantry-card-body">
           <span>{{ entry.quantity }} {{ entry.unit }}</span>
