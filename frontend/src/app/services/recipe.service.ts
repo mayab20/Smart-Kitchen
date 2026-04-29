@@ -7,6 +7,12 @@ export interface Recipe {
   id?: number;
   title: string;
   description: string;
+  category?: string;
+  servings?: number;
+  instructions?: string;
+  image?: string | File | null;
+  pdf_file?: string | File | null;
+  recipe_ingredients?: Array<{ingredient: number; quantity: string}>;
 }
 
 @Injectable({
@@ -18,9 +24,10 @@ export class RecipeService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   private get headers() {
-    return {
-      headers: { Authorization: `Bearer ${this.authService.getAccessToken()}` },
-    };
+    const token = this.authService.getAccessToken();
+    return token && token !== 'null' && token !== 'undefined'
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : {};
   }
 
   getMyRecipes(): Observable<Recipe[]> {
@@ -32,7 +39,7 @@ export class RecipeService {
   }
 
   addRecipe(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data, this.headers);
+    return this.http.post(this.apiUrl, data);
   }
 
   deleteRecipe(id: number): Observable<any> {

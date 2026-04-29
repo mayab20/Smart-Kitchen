@@ -18,10 +18,22 @@ export class RecipeFormComponent implements OnInit {
   recipe: any = {
     title: '',
     description: '',
+    category: 'OTHER',
+    servings: 1,
     instructions: '',
     image: null,
     pdf_file: null
   };
+
+    recipeCategories = [
+    { value: 'SALAD', label: 'Salad' },
+    { value: 'SOUP', label: 'Soup' },
+    { value: 'APPETIZER', label: 'Appetizer' },
+    { value: 'MAIN', label: 'Main Course' },
+    { value: 'DESSERT', label: 'Dessert' },
+    { value: 'DRINK', label: 'Drink' },
+    { value: 'OTHER', label: 'Other' }
+  ];
 
   selectedIngredients: any[] = [];
   suggestions: any[] = [];
@@ -45,7 +57,18 @@ export class RecipeFormComponent implements OnInit {
       this.isEditMode = true;
       this.recipeService.getRecipes().subscribe(data => {
         const found = data.find((r: any) => r.id == this.recipeId);
-        if (found) this.recipe = found;
+        if (found) {
+          this.recipe = found;
+          if (found.recipe_ingredients) {
+            this.selectedIngredients = found.recipe_ingredients.map((ri: any) => ({
+              ingredient: ri.ingredient,
+              name: ri.ingredient_name,
+              quantity: ri.quantity,
+              unit: ri.unit,
+              allowed_units: ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'] // Default units
+            }));
+          }
+        }
       });
     }
 
@@ -70,12 +93,13 @@ export class RecipeFormComponent implements OnInit {
   selectIngredient(item: any) {
     const already = this.selectedIngredients.find(i => i.ingredient === item.id);
     if (!already) {
+      const allowedUnits = item.allowed_units && item.allowed_units.length > 0 ? item.allowed_units : ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'];
       this.selectedIngredients.push({
         ingredient: item.id,
         name: item.name,
         quantity: '',
-        unit: item.allowed_units?.[0] ?? 'NONE',
-        allowed_units: item.allowed_units ?? []
+        unit: allowedUnits[0],
+        allowed_units: allowedUnits
       });
     }
     this.ingredientSearch = '';
@@ -93,12 +117,45 @@ export class RecipeFormComponent implements OnInit {
   }
 
   submit() {
+    // Validation
+    if (!this.recipe.title.trim()) {
+      alert('Title is required');
+      return;
+    }
+
+    if (this.selectedIngredients.length === 0) {
+      alert('At least one ingredient is required');
+      return;
+    }
+
+    for (let ing of this.selectedIngredients) {
+      if (!ing.quantity || !ing.unit) {
+        alert('All ingredients must have quantity and unit');
+        return;
+      }
+    }
+
     const formData = new FormData();
     for (let key in this.recipe) {
-      if (this.recipe[key] !== null) formData.append(key, this.recipe[key]);
+      const value = this.recipe[key];
+      if (value !== null && value !== undefined && value !== '') {
+        formData.append(key, value);
+      }
     }
-    formData.append('ingredients_data', JSON.stringify(this.selectedIngredients));
-    this.recipeService.addRecipe(formData).subscribe(() => {
+
+    const ingredientPayload = this.selectedIngredients.map((ing: any) => ({
+      ingredient: ing.ingredient,
+      quantity: ing.quantity,
+      unit: ing.unit
+    }));
+
+    formData.append('ingredients_data', JSON.stringify(ingredientPayload));
+
+    const request = this.isEditMode
+      ? this.recipeService.updateRecipe(this.recipeId, formData)
+      : this.recipeService.addRecipe(formData);
+
+    request.subscribe(() => {
       this.router.navigate(['/']);
     });
   }
