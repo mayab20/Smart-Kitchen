@@ -1,2 +1,6 @@
 .venv
 .env
+CookWise.items.json
+CookWise.recipes.json
+Import_mongo_data.py
+pyrightconfig.json
