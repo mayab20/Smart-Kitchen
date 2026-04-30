@@ -2,7 +2,7 @@
   <div class="profile-header-card">
     <div class="profile-header">
       <div class="avatar-section">
-        <div class="avatar">👨‍🍳</div>
+        <div class="avatar">SK</div>
         <div class="user-info">
           <h2>My Profile</h2>
           <p>Welcome back! Ready to create something delicious?</p>
@@ -10,17 +10,12 @@
       </div>
 
       <div class="profile-actions">
-        <button class="logout-btn" (click)="onLogout()">
-          <span class="logout-icon">�</span>
-          Logout
-        </button>
+        <button class="logout-btn" (click)="onLogout()">Logout</button>
       </div>
     </div>
   </div>
 
   <div class="profile-content">
-
-    <!-- My Recipes Section -->
     <div class="recipes-section">
       <div class="section-header">
         <h3>My Recipes</h3>
@@ -33,7 +28,6 @@
       @if (myRecipes.length === 0) {
         <div class="empty-state">
           <div class="empty-content">
-            <span class="empty-icon">�</span>
             <h4>No recipes yet</h4>
             <p>You haven't created any recipes yet. Start sharing your culinary masterpieces!</p>
             <a routerLink="/add" class="cta-btn">Create Your First Recipe</a>
@@ -45,22 +39,17 @@
         @for (recipe of myRecipes; track recipe.id) {
           <div class="recipe-card">
             <div class="card-image">
-              @if (recipe.image) {
-                <img [src]="recipe.image" [alt]="recipe.title" />
-              } @else {
-                <div class="no-image">
-                  <span class="no-image-icon">📷</span>
-                </div>
-              }
+              <img
+                [src]="getImageUrl(recipe.image, recipe.category)"
+                [alt]="recipe.title"
+                (error)="onImageError($event, recipe.category)"
+              />
             </div>
 
             <div class="card-content">
               <div class="card-header">
                 <h4 class="recipe-title">{{ recipe.title }}</h4>
-                <span class="servings-badge">
-                  <span class="people-icon">👥</span>
-                  {{ recipe.servings }}
-                </span>
+                <span class="servings-badge">{{ recipe.servings }}</span>
               </div>
 
               <p class="recipe-description">{{ recipe.description }}</p>
@@ -72,23 +61,13 @@
             </div>
 
             <div class="card-actions">
-              <button class="action-btn view-btn" [routerLink]="['/recipe', recipe.id]">
-                <span class="btn-icon">👁️</span>
-                View
-              </button>
-              <button class="action-btn edit-btn" [routerLink]="['/edit', recipe.id]">
-                <span class="btn-icon">✏️</span>
-                Edit
-              </button>
-              <button class="action-btn delete-btn" (click)="deleteRecipe(recipe.id)">
-                <span class="btn-icon">🗑️</span>
-                Delete
-              </button>
+              <button class="action-btn view-btn" [routerLink]="['/recipe', recipe.id]">View</button>
+              <button class="action-btn edit-btn" [routerLink]="['/edit', recipe.id]">Edit</button>
+              <button class="action-btn delete-btn" (click)="deleteRecipe(recipe.id)">Delete</button>
             </div>
           </div>
         }
       </div>
     </div>
-
   </div>
 </div>

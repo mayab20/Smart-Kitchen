@@ -84,10 +84,16 @@ export class RecipeDetailComponent implements OnInit {
       if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
         return imagePath;
       }
+      if (imagePath.startsWith('/media/')) {
+        return `http://127.0.0.1:8000${imagePath}`;
+      }
       if (imagePath.startsWith('/')) {
         return imagePath;
       }
-      return `http://127.0.0.1:8000/${imagePath}`;
+      if (imagePath.startsWith('media/')) {
+        return `http://127.0.0.1:8000/${imagePath}`;
+      }
+      return `http://127.0.0.1:8000/media/${imagePath}`;
     }
     return this.getDefaultImage(category);
   }
@@ -99,10 +105,16 @@ export class RecipeDetailComponent implements OnInit {
     if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
       return pdfPath;
     }
+    if (pdfPath.startsWith('/media/')) {
+      return `http://127.0.0.1:8000${pdfPath}`;
+    }
     if (pdfPath.startsWith('/')) {
       return pdfPath;
     }
-    return `http://127.0.0.1:8000/${pdfPath}`;
+    if (pdfPath.startsWith('media/')) {
+      return `http://127.0.0.1:8000/${pdfPath}`;
+    }
+    return `http://127.0.0.1:8000/media/${pdfPath}`;
   }
 
   private getDefaultImage(category: string): string {

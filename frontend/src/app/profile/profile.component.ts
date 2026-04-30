@@ -44,6 +44,43 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  getImageUrl(imagePath: string | null, category: string): string {
+    if (imagePath) {
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      if (imagePath.startsWith('/media/')) {
+        return `http://127.0.0.1:8000${imagePath}`;
+      }
+      if (imagePath.startsWith('/')) {
+        return imagePath;
+      }
+      if (imagePath.startsWith('media/')) {
+        return `http://127.0.0.1:8000/${imagePath}`;
+      }
+      return `http://127.0.0.1:8000/media/${imagePath}`;
+    }
+    return this.getDefaultImage(category);
+  }
+
+  onImageError(event: Event, category: string) {
+    const image = event.target as HTMLImageElement;
+    image.src = this.getDefaultImage(category);
+  }
+
+  private getDefaultImage(category: string): string {
+    const defaults: Record<string, string> = {
+      SALAD: '/images/salad-svgrepo-com.svg',
+      SOUP: '/images/soup-svgrepo-com.svg',
+      APPETIZER: '/images/starter-svgrepo-com.svg',
+      MAIN: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
+      DRINK: '/images/drink-soft-drink-svgrepo-com.svg',
+      OTHER: '/images/oden-svgrepo-com.svg'
+    };
+    return defaults[category] || defaults['OTHER'];
+  }
+
   onLogout() {
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/login']),

@@ -1,1 +1,325 @@
-/* You can add global styles to this file, and also import other style files */
+/* Smart Kitchen design system */
+:root {
+  --sk-bg: #f6f4ef;
+  --sk-surface: #ffffff;
+  --sk-surface-soft: #fbfaf7;
+  --sk-surface-muted: #efe9df;
+  --sk-text: #1f2933;
+  --sk-text-muted: #65717d;
+  --sk-border: #ded7cb;
+  --sk-primary: #c2412d;
+  --sk-primary-hover: #a93425;
+  --sk-primary-soft: #f8ded8;
+  --sk-accent: #2f7d68;
+  --sk-accent-soft: #dff1eb;
+  --sk-warning: #b7791f;
+  --sk-warning-soft: #fff2cf;
+  --sk-danger: #b42318;
+  --sk-danger-soft: #fde3df;
+  --sk-info: #315c99;
+  --sk-info-soft: #e2ebf8;
+
+  --sk-radius-sm: 6px;
+  --sk-radius-md: 8px;
+  --sk-radius-lg: 12px;
+  --sk-shadow-sm: 0 1px 2px rgba(31, 41, 51, 0.08);
+  --sk-shadow-md: 0 10px 24px rgba(31, 41, 51, 0.10);
+  --sk-shadow-lg: 0 18px 42px rgba(31, 41, 51, 0.14);
+
+  --sk-space-1: 4px;
+  --sk-space-2: 8px;
+  --sk-space-3: 12px;
+  --sk-space-4: 16px;
+  --sk-space-5: 24px;
+  --sk-space-6: 32px;
+  --sk-space-7: 48px;
+  --sk-container: 1180px;
+  --sk-control-h: 44px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--sk-bg);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(246, 244, 239, 0) 260px),
+    var(--sk-bg);
+  color: var(--sk-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.page-shell,
+.recipes-container,
+.profile-container,
+.pantry-container,
+.form-container,
+.recipe-detail-container {
+  width: min(var(--sk-container), calc(100% - 32px));
+  margin: 0 auto;
+  padding: var(--sk-space-6) 0;
+}
+
+.panel,
+.recipe-card,
+.form-card,
+.add-item-card,
+.profile-header-card,
+.pantry-card,
+.empty-state {
+  background: var(--sk-surface);
+  border: 1px solid var(--sk-border);
+  border-radius: var(--sk-radius-lg);
+  box-shadow: var(--sk-shadow-sm);
+}
+
+.section-header,
+.header-section,
+.pantry-header,
+.form-header,
+.profile-header {
+  margin-bottom: var(--sk-space-6);
+}
+
+.header-section,
+.pantry-header,
+.form-header {
+  text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--sk-text);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: var(--sk-space-3);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+h3 {
+  margin-bottom: var(--sk-space-4);
+  font-size: 1.35rem;
+}
+
+p {
+  color: var(--sk-text-muted);
+}
+
+.btn,
+button,
+.view-recipe-btn,
+.add-recipe-btn,
+.cta-btn,
+.submit-btn,
+.add-btn,
+.filter-btn,
+.action-btn,
+.icon-btn,
+.pdf-btn,
+.confirm-cook-btn,
+.cancel-cook-btn,
+.clear-btn,
+.delete-btn {
+  min-height: var(--sk-control-h);
+  border: 1px solid transparent;
+  border-radius: var(--sk-radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sk-space-2);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.view-recipe-btn,
+.add-recipe-btn,
+.cta-btn,
+.submit-btn,
+.add-btn,
+.confirm-cook-btn {
+  background: var(--sk-primary);
+  color: #fff;
+  padding: 0 var(--sk-space-5);
+}
+
+.view-recipe-btn:hover,
+.add-recipe-btn:hover,
+.cta-btn:hover,
+.submit-btn:hover,
+.add-btn:hover,
+.confirm-cook-btn:hover {
+  background: var(--sk-primary-hover);
+  box-shadow: var(--sk-shadow-md);
+  transform: translateY(-1px);
+}
+
+.delete-btn,
+.cancel-cook-btn {
+  background: var(--sk-danger-soft);
+  color: var(--sk-danger);
+}
+
+.edit-btn {
+  background: var(--sk-warning-soft);
+  color: var(--sk-warning);
+}
+
+.view-btn,
+.save-btn {
+  background: var(--sk-accent-soft);
+  color: var(--sk-accent);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--sk-border);
+  border-radius: var(--sk-radius-md);
+  background: var(--sk-surface);
+  color: var(--sk-text);
+  min-height: var(--sk-control-h);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--sk-primary);
+  box-shadow: 0 0 0 3px rgba(194, 65, 45, 0.13);
+}
+
+label {
+  color: var(--sk-text);
+  font-weight: 700;
+}
+
+.recipes-grid,
+.pantry-grid,
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--sk-space-5);
+}
+
+.card-image,
+.recipe-image-section {
+  background: var(--sk-surface-muted);
+}
+
+.card-image img,
+.recipe-image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: var(--sk-space-3);
+}
+
+.badge,
+.category-badge,
+.servings-badge {
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sk-space-1);
+  min-height: 28px;
+  padding: 4px 10px;
+  background: var(--sk-info-soft);
+  color: var(--sk-info);
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.suggestions,
+.suggestions-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--sk-space-2);
+  list-style: none;
+  background: var(--sk-surface);
+  border: 1px solid var(--sk-border);
+  border-radius: var(--sk-radius-md);
+  box-shadow: var(--sk-shadow-md);
+}
+
+.suggestion-item {
+  border-radius: var(--sk-radius-sm);
+  cursor: pointer;
+  padding: 10px 12px;
+}
+
+.suggestion-item:hover {
+  background: var(--sk-surface-soft);
+}
+
+@media (max-width: 720px) {
+  .page-shell,
+  .recipes-container,
+  .profile-container,
+  .pantry-container,
+  .form-container,
+  .recipe-detail-container {
+    width: min(100% - 20px, var(--sk-container));
+    padding: var(--sk-space-5) 0;
+  }
+}
