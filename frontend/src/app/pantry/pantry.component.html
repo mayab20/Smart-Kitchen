@@ -5,6 +5,7 @@
   <!-- Add Item Form -->
   <div class="card">
     <h3>Add to Pantry</h3>
+
     <form (ngSubmit)="addEntry()" class="add-form">
 
       <div class="form-group search-group">
@@ -53,6 +54,10 @@
 
     </form>
   </div>
+
+  @if (addError) {
+    <p class="error">{{ addError }}</p>
+  }
 
   <!-- Category Filter -->
   <div class="filter-bar">
