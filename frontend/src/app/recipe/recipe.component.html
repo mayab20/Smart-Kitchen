@@ -1,20 +1,40 @@
-<h2>Recipes</h2>
+<div class="recipes-container">
+  <div class="header-section">
+    <h2>🍳 Delicious Recipes</h2>
 
-<label for="categoryFilter">Filter by category:</label>
-<select id="categoryFilter" [(ngModel)]="selectedCategory">
-  <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{ cat.label }}</option>
-</select>
+    <div class="filter-section">
+      <label for="categoryFilter">Filter by category:</label>
+      <select id="categoryFilter" [(ngModel)]="selectedCategory" class="filter-select">
+        <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{ cat.label }}</option>
+      </select>
+    </div>
+  </div>
 
-<div *ngIf="filteredRecipes.length === 0">
-  No recipes found.
-</div>
+  <div *ngIf="filteredRecipes.length === 0" class="no-recipes">
+    <div class="empty-state">
+      <span class="empty-icon">🍽️</span>
+      <h3>No recipes found</h3>
+      <p>Try adjusting your filter or add a new recipe!</p>
+    </div>
+  </div>
 
-<div *ngFor="let recipe of filteredRecipes" class="card">
-  <h3>{{ recipe.title }}</h3>
+  <div class="recipes-grid">
+    <div *ngFor="let recipe of filteredRecipes" class="recipe-card">
+      <div class="card-image">
+        <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
+        <div class="servings-badge">
+          <span class="people-icon">👥</span>
+          <span class="servings-text">{{ recipe.servings }}</span>
+        </div>
+      </div>
 
-  <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
-
-  <p>{{ recipe.description }}</p>
-
-  <button [routerLink]="['/recipe', recipe.id]">View</button>
+      <div class="card-content">
+        <h3 class="recipe-title">{{ recipe.title }}</h3>
+        <p class="recipe-description">{{ recipe.description }}</p>
+        <button class="view-recipe-btn" [routerLink]="['/recipe', recipe.id]">
+          View Recipe
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

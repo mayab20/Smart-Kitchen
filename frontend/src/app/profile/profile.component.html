@@ -1,37 +1,94 @@
 <div class="profile-container">
+  <div class="profile-header-card">
+    <div class="profile-header">
+      <div class="avatar-section">
+        <div class="avatar">👨‍🍳</div>
+        <div class="user-info">
+          <h2>My Profile</h2>
+          <p>Welcome back! Ready to create something delicious?</p>
+        </div>
+      </div>
 
-  <div class="profile-header">
-    <div class="avatar">👤</div>
-    <div class="profile-actions">
-      <button class="logout-btn" (click)="onLogout()">Logout</button>
+      <div class="profile-actions">
+        <button class="logout-btn" (click)="onLogout()">
+          <span class="logout-icon">�</span>
+          Logout
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="section">
-    <h3>My Recipes</h3>
+  <div class="profile-content">
 
-    @if (myRecipes.length === 0) {
-      <p class="empty">You haven't created any recipes yet. <a routerLink="/add">Add one</a></p>
-    }
+    <!-- My Recipes Section -->
+    <div class="recipes-section">
+      <div class="section-header">
+        <h3>My Recipes</h3>
+        <a routerLink="/add" class="add-recipe-btn">
+          <span class="add-icon">+</span>
+          Add New Recipe
+        </a>
+      </div>
 
-    <div class="recipes-grid">
-      @for (recipe of myRecipes; track recipe.id) {
-        <div class="recipe-card">
-          @if (recipe.image) {
-            <img [src]="recipe.image" [alt]="recipe.title" />
-          }
-          <div class="recipe-card-body">
-            <h4>{{ recipe.title }}</h4>
-            <p>{{ recipe.description }}</p>
-            <div class="recipe-card-actions">
-              <a [routerLink]="['/recipe', recipe.id]">View</a>
-              <a [routerLink]="['/edit', recipe.id]">Edit</a>
-              <button (click)="deleteRecipe(recipe.id)">Delete</button>
-            </div>
+      @if (myRecipes.length === 0) {
+        <div class="empty-state">
+          <div class="empty-content">
+            <span class="empty-icon">�</span>
+            <h4>No recipes yet</h4>
+            <p>You haven't created any recipes yet. Start sharing your culinary masterpieces!</p>
+            <a routerLink="/add" class="cta-btn">Create Your First Recipe</a>
           </div>
         </div>
       }
-    </div>
-  </div>
 
+      <div class="recipes-grid">
+        @for (recipe of myRecipes; track recipe.id) {
+          <div class="recipe-card">
+            <div class="card-image">
+              @if (recipe.image) {
+                <img [src]="recipe.image" [alt]="recipe.title" />
+              } @else {
+                <div class="no-image">
+                  <span class="no-image-icon">📷</span>
+                </div>
+              }
+            </div>
+
+            <div class="card-content">
+              <div class="card-header">
+                <h4 class="recipe-title">{{ recipe.title }}</h4>
+                <span class="servings-badge">
+                  <span class="people-icon">👥</span>
+                  {{ recipe.servings }}
+                </span>
+              </div>
+
+              <p class="recipe-description">{{ recipe.description }}</p>
+
+              <div class="recipe-meta">
+                <span class="category-badge">{{ recipe.category }}</span>
+                <span class="created-date">Created {{ recipe.created_at | date:'short' }}</span>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="action-btn view-btn" [routerLink]="['/recipe', recipe.id]">
+                <span class="btn-icon">👁️</span>
+                View
+              </button>
+              <button class="action-btn edit-btn" [routerLink]="['/edit', recipe.id]">
+                <span class="btn-icon">✏️</span>
+                Edit
+              </button>
+              <button class="action-btn delete-btn" (click)="deleteRecipe(recipe.id)">
+                <span class="btn-icon">🗑️</span>
+                Delete
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
 </div>

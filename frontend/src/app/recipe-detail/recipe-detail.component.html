@@ -1,102 +1,173 @@
-<div *ngIf="recipe" class="detail-container">
+<div *ngIf="recipe" class="recipe-detail-container">
+  <div class="recipe-card">
 
-  <div class="buttons">
-    <button *ngIf="!isEditing" (click)="editRecipe()">Edit</button>
-    <button *ngIf="!isEditing" (click)="deleteRecipe()">Delete</button>
-    <button *ngIf="isEditing" (click)="saveRecipe()">Save</button>
-    <button *ngIf="isEditing" (click)="cancelEdit()">Cancel</button>
-  </div>
-
-  <h2 *ngIf="!isEditing">{{recipe.title}}</h2>
-  <input *ngIf="isEditing" [(ngModel)]="recipe.title" placeholder="Title">
-
-  <p *ngIf="!isEditing"><strong>Category:</strong> {{ getCategoryLabel(recipe.category) }}</p>
-  <select *ngIf="isEditing" [(ngModel)]="recipe.category">
-    <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{cat.label}}</option>
-  </select>
-
-  <p *ngIf="!isEditing"><strong>Servings:</strong> {{ recipe.servings }}</p>
-  <input *ngIf="isEditing" type="number" min="1" [(ngModel)]="recipe.servings" placeholder="Servings">
-
-  <!-- IMAGE -->
-  <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
-  <div *ngIf="isEditing" class="file-field">
-    <div *ngIf="recipe.image">
-      <button type="button" (click)="clearImage()">Clear image</button>
-    </div>
-    <label>Replace image:</label>
-    <input type="file" (change)="onFileChange($event, 'image')" accept="image/*">
-  </div>
-
-  <p *ngIf="!isEditing">{{recipe.description}}</p>
-  <textarea *ngIf="isEditing" [(ngModel)]="recipe.description" placeholder="Description"></textarea>
-
-  <h4>Instructions</h4>
-  <p *ngIf="!isEditing">{{recipe.instructions}}</p>
-  <textarea *ngIf="isEditing" [(ngModel)]="recipe.instructions" placeholder="Instructions"></textarea>
-
-  <div *ngIf="recipe.pdf_file">
-    <a [href]="getPdfUrl(recipe.pdf_file)" target="_blank">📄 View PDF</a>
-  </div>
-  <div *ngIf="isEditing" class="file-field">
-    <div *ngIf="recipe.pdf_file">
-      <button type="button" (click)="clearPdf()">Clear PDF</button>
-    </div>
-    <label>Replace PDF:</label>
-    <input type="file" (change)="onFileChange($event, 'pdf_file')" accept="application/pdf">
-  </div>
-
-  <h3>Ingredients</h3>
-
-  <button *ngIf="!cookMode" type="button" (click)="startCook()">Cook</button>
-
-  <div *ngIf="cookMode" class="cook-panel">
-    <label>Servings:</label>
-    <input type="number" min="1" [(ngModel)]="cookServings">
-    <div *ngIf="cookError" class="error">{{ cookError }}</div>
-    <div *ngIf="cookMessage" class="success">{{ cookMessage }}</div>
-    <ul>
-      <li *ngFor="let ing of recipe.recipe_ingredients">
-        <span [class.available]="getCookAvailable(ing)" [class.unavailable]="!getCookAvailable(ing)">
-          {{ getCookAvailable(ing) ? '✔' : '✘' }}
-        </span>
-        {{ ing.ingredient_name }} - {{ getScaledQuantity(ing) }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
-        <span class="small">(pantry: {{ ing.pantry_quantity || 0 }})</span>
-      </li>
-    </ul>
-    <button type="button" (click)="confirmCook()">Confirm Cook</button>
-    <button type="button" (click)="cancelCook()">Cancel</button>
-  </div>
-
-  <div *ngIf="!cookMode && !isEditing">
-    <ul>
-      <li *ngFor="let ing of recipe.recipe_ingredients">
-        <span [class.available]="ing.has_pantry" [class.unavailable]="!ing.has_pantry">
-          {{ ing.has_pantry ? '✔' : '✘' }}
-        </span>
-        {{ ing.ingredient_name }} - {{ ing.quantity }}<span *ngIf="ing.unit || ing.ingredient_unit"> {{ ing.unit || ing.ingredient_unit }}</span>
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="isEditing">
-    <div class="ingredient-search">
-      <input type="text" [(ngModel)]="ingredientSearch" (input)="onSearchInput()" placeholder="Search ingredients">
-      <ul *ngIf="suggestions.length > 0" class="suggestions-list">
-        <li *ngFor="let suggestion of suggestions" (click)="selectIngredient(suggestion)">{{ suggestion.name }}</li>
-      </ul>
+    <!-- Action Buttons -->
+    <div class="action-buttons" *ngIf="!isEditing">
+      <button class="icon-btn edit-btn" (click)="editRecipe()" title="Edit Recipe">
+        <span class="icon">✏️</span>
+      </button>
+      <button class="icon-btn delete-btn" (click)="deleteRecipe()" title="Delete Recipe">
+        <span class="icon">🗑️</span>
+      </button>
     </div>
 
-    <ul>
-      <li *ngFor="let ing of selectedIngredients; let i = index">
-        <strong>{{ing.name}}</strong>
-        <input type="text" [(ngModel)]="ing.quantity" placeholder="Quantity">
-        <select [(ngModel)]="ing.unit">
-          <option *ngFor="let unit of ing.allowed_units" [value]="unit">{{unit}}</option>
-        </select>
-        <button type="button" (click)="removeIngredient(ing.ingredient)">Remove</button>
-      </li>
-    </ul>
-  </div>
+    <div class="save-cancel-buttons" *ngIf="isEditing">
+      <button class="icon-btn save-btn" (click)="saveRecipe()" title="Save Changes">
+        <span class="icon">💾</span>
+      </button>
+      <button class="icon-btn cancel-btn" (click)="cancelEdit()" title="Cancel Edit">
+        <span class="icon">❌</span>
+      </button>
+    </div>
 
+    <!-- Recipe Image -->
+    <div class="recipe-image-section">
+      <img [src]="getImageUrl(recipe.image, recipe.category)" [alt]="recipe.title + ' image'">
+
+      <!-- Title and Description Overlay -->
+      <div class="image-overlay">
+        <div class="overlay-content">
+          <h1 *ngIf="!isEditing" class="recipe-title">{{recipe.title}}</h1>
+          <input *ngIf="isEditing" [(ngModel)]="recipe.title" placeholder="Title" class="title-input">
+
+          <p *ngIf="!isEditing" class="recipe-description">{{recipe.description}}</p>
+          <textarea *ngIf="isEditing" [(ngModel)]="recipe.description" placeholder="Description" class="description-input"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recipe Details -->
+    <div class="recipe-details">
+
+      <!-- Category and Servings -->
+      <div class="recipe-meta">
+        <div class="meta-item">
+          <span class="meta-label">Category:</span>
+          <span *ngIf="!isEditing" class="meta-value">{{ getCategoryLabel(recipe.category) }}</span>
+          <select *ngIf="isEditing" [(ngModel)]="recipe.category" class="meta-select">
+            <option *ngFor="let cat of recipeCategories" [value]="cat.value">{{cat.label}}</option>
+          </select>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Servings:</span>
+          <span *ngIf="!isEditing" class="meta-value">{{ recipe.servings }}</span>
+          <input *ngIf="isEditing" type="number" min="1" [(ngModel)]="recipe.servings" placeholder="Servings" class="meta-input">
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      <div class="ingredients-section">
+        <h3 class="section-title">🍎 Ingredients</h3>
+
+        <button *ngIf="!cookMode && !isEditing" class="cook-btn" (click)="startCook()">
+          <span class="chef-hat">👨‍🍳</span>
+          Cook this Recipe
+        </button>
+
+        <!-- Cook Mode Panel -->
+        <div *ngIf="cookMode" class="cook-panel">
+          <div class="cook-header">
+            <h4>Let's Cook! 🍳</h4>
+            <div class="servings-input">
+              <label>Servings:</label>
+              <input type="number" min="1" [(ngModel)]="cookServings">
+            </div>
+          </div>
+
+          <div *ngIf="cookError" class="error-message">{{ cookError }}</div>
+          <div *ngIf="cookMessage" class="success-message">{{ cookMessage }}</div>
+
+          <ul class="ingredients-list cook-list">
+            <li *ngFor="let ing of recipe.recipe_ingredients" class="ingredient-item">
+              <span class="availability-icon" [class.available]="getCookAvailable(ing)" [class.unavailable]="!getCookAvailable(ing)">
+                <span class="check-icon" *ngIf="getCookAvailable(ing)">✓</span>
+                <span class="cross-icon" *ngIf="!getCookAvailable(ing)">✗</span>
+              </span>
+              <span class="ingredient-text">
+                {{ ing.ingredient_name }} - {{ getScaledQuantity(ing) }}
+                <span *ngIf="ing.unit || ing.ingredient_unit" class="unit"> {{ ing.unit || ing.ingredient_unit }}</span>
+              </span>
+              <span class="pantry-info">(pantry: {{ ing.pantry_quantity || 0 }})</span>
+            </li>
+          </ul>
+
+          <div class="cook-actions">
+            <button class="confirm-cook-btn" (click)="confirmCook()">Confirm Cook</button>
+            <button class="cancel-cook-btn" (click)="cancelCook()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Normal Ingredients List -->
+        <ul *ngIf="!cookMode && !isEditing" class="ingredients-list">
+          <li *ngFor="let ing of recipe.recipe_ingredients" class="ingredient-item">
+            <span class="availability-icon" [class.available]="ing.has_pantry" [class.unavailable]="!ing.has_pantry">
+              <span class="check-icon" *ngIf="ing.has_pantry">✓</span>
+              <span class="cross-icon" *ngIf="!ing.has_pantry">✗</span>
+            </span>
+            <span class="ingredient-text">
+              {{ ing.ingredient_name }} - {{ ing.quantity }}
+              <span *ngIf="ing.unit || ing.ingredient_unit" class="unit"> {{ ing.unit || ing.ingredient_unit }}</span>
+            </span>
+          </li>
+        </ul>
+
+        <!-- Edit Mode Ingredients -->
+        <div *ngIf="isEditing" class="edit-ingredients">
+          <div class="ingredient-search">
+            <input type="text" [(ngModel)]="ingredientSearch" (input)="onSearchInput()" placeholder="Search ingredients" class="search-input">
+            <ul *ngIf="suggestions.length > 0" class="suggestions-list">
+              <li *ngFor="let suggestion of suggestions" (click)="selectIngredient(suggestion)" class="suggestion-item">{{ suggestion.name }}</li>
+            </ul>
+          </div>
+
+          <ul class="selected-ingredients">
+            <li *ngFor="let ing of selectedIngredients; let i = index" class="selected-item">
+              <span class="ingredient-name">{{ing.name}}</span>
+              <input type="text" [(ngModel)]="ing.quantity" placeholder="Quantity" class="quantity-input">
+              <select [(ngModel)]="ing.unit" class="unit-select">
+                <option *ngFor="let unit of ing.allowed_units" [value]="unit">{{unit}}</option>
+              </select>
+              <button type="button" (click)="removeIngredient(ing.ingredient)" class="remove-btn">✕</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Instructions Section -->
+      <div class="instructions-section">
+        <h3 class="section-title">📝 Instructions</h3>
+        <div *ngIf="!isEditing" class="instructions-content">
+          {{recipe.instructions}}
+        </div>
+        <textarea *ngIf="isEditing" [(ngModel)]="recipe.instructions" placeholder="Instructions" class="instructions-input"></textarea>
+      </div>
+
+      <!-- File Attachments -->
+      <div class="files-section" *ngIf="recipe.pdf_file || isEditing">
+        <h3 class="section-title">📎 Files</h3>
+
+        <div *ngIf="recipe.pdf_file" class="pdf-link">
+          <a [href]="getPdfUrl(recipe.pdf_file)" target="_blank" class="pdf-btn">
+            📄 View PDF Recipe
+          </a>
+        </div>
+
+        <div *ngIf="isEditing" class="file-inputs">
+          <div *ngIf="recipe.image" class="file-field">
+            <button type="button" (click)="clearImage()" class="clear-btn">Clear image</button>
+          </div>
+          <label>Replace image:</label>
+          <input type="file" (change)="onFileChange($event, 'image')" accept="image/*" class="file-input">
+
+          <div *ngIf="recipe.pdf_file" class="file-field">
+            <button type="button" (click)="clearPdf()" class="clear-btn">Clear PDF</button>
+          </div>
+          <label>Replace PDF:</label>
+          <input type="file" (change)="onFileChange($event, 'pdf_file')" accept="application/pdf" class="file-input">
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>

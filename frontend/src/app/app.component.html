@@ -1,19 +1,17 @@
 <nav class="navbar">
-  <h2>🍳 Smart Kitchen</h2>
+  <h2>Smart Kitchen</h2>
 
   <div class="links">
     <a routerLink="/">Home</a>
-    <a *ngIf="authService.isLoggedIn()" routerLink="/add">Add Recipe</a>
 
-    <ng-container *ngIf="authService.isLoggedIn(); else guestLinks">
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/add">Add Recipe</a>
       <a routerLink="/pantry">My Pantry</a>
       <a routerLink="/profile">Profile</a>
-    </ng-container>
-
-    <ng-template #guestLinks>
+    } @else {
       <a routerLink="/signup">Sign Up</a>
       <a routerLink="/login">Login</a>
-    </ng-template>
+    }
   </div>
 </nav>
 

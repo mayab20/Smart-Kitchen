@@ -162,6 +162,30 @@ export class PantryComponent implements OnInit {
     });
   }
 
+  isExpired(expirationDate: string): boolean {
+    if (!expirationDate) {
+      return false;
+    }
+
+    const now = new Date();
+    const expiry = new Date(expirationDate);
+
+    return expiry < now;
+  }
+
+  isExpiringSoon(expirationDate: string): boolean {
+    if (!expirationDate) {
+      return false;
+    }
+
+    const now = new Date();
+    const expiry = new Date(expirationDate);
+    const diffMs = expiry.getTime() - now.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+    return diffDays >= 0 && diffDays <= 3;
+  }
+
   deleteEntry(id: number) {
     this.pantryService.deleteFromPantry(id).subscribe(() => this.loadPantry());
   }

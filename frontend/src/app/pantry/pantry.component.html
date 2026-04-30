@@ -1,88 +1,153 @@
 <div class="pantry-container">
-
-  <h2>🧺 My Pantry</h2>
+  <div class="pantry-header">
+    <h2>My Pantry</h2>
+    <p>Keep track of your ingredients and never run out of cooking essentials</p>
+  </div>
 
   <!-- Add Item Form -->
-  <div class="card">
-    <h3>Add to Pantry</h3>
+  <div class="add-item-card">
+    <div class="card-header">
+      <h3>Add New Item</h3>
+    </div>
+
     <form (ngSubmit)="addEntry()" class="add-form">
 
-      <div class="form-group search-group">
-        <label>Item</label>
-        <div class="search-wrapper">
+      <div class="form-row">
+        <div class="form-group search-group">
+          <label>Item Name</label>
+          <div class="search-wrapper">
+            <input
+              type="text"
+              [(ngModel)]="itemSearch"
+              name="itemSearch"
+              placeholder="Search for item..."
+              (input)="onSearchInput()"
+              (focus)="showSuggestions = true"
+              (blur)="showSuggestions = false"
+              autocomplete="off"
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+            @if (showSuggestions && suggestions.length > 0) {
+              <ul class="suggestions">
+                @for (s of suggestions; track s.id) {
+                  <li (mousedown)="selectItem(s)" class="suggestion-item">
+                    {{ s.name }}
+                    <span class="category-badge">{{ s.category }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Quantity</label>
           <input
-            type="text"
-            [(ngModel)]="itemSearch"
-            name="itemSearch"
-            placeholder="Search item..."
-            (input)="onSearchInput()"
-            (focus)="showSuggestions = true"
-            (blur)="showSuggestions = false"
-            autocomplete="off"
+            type="number"
+            [(ngModel)]="newEntry.quantity"
+            name="quantity"
+            min="0.1"
+            step="0.1"
+            required
+            placeholder="0.0"
+            class="form-input"
           />
-          @if (showSuggestions && suggestions.length > 0) {
-            <ul class="suggestions">
-              @for (s of suggestions; track s.id) {
-                <li (mousedown)="selectItem(s)">{{ s.name }} <span>{{ s.category }}</span></li>
-              }
-            </ul>
-          }
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Quantity</label>
-        <input type="number" [(ngModel)]="newEntry.quantity" name="quantity" min="0.1" step="0.1" required />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Unit</label>
+          <select [(ngModel)]="newEntry.unit" name="unit" class="form-select">
+            @for (unit of selectedItemUnits; track unit) {
+              <option [value]="unit">{{ unit }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Expiration Date</label>
+          <input
+            type="date"
+            [(ngModel)]="newEntry.expiration_date"
+            name="expiration_date"
+            required
+            class="form-input"
+          />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Unit</label>
-        <select [(ngModel)]="newEntry.unit" name="unit">
-          @for (unit of selectedItemUnits; track unit) {
-            <option [value]="unit">{{ unit }}</option>
-          }
-        </select>
+      <div class="form-actions">
+        <button type="submit" class="add-btn">
+          <span class="btn-icon">➕</span>
+          Add to Pantry
+        </button>
       </div>
-
-      <div class="form-group">
-        <label>Expiration Date</label>
-        <input type="date" [(ngModel)]="newEntry.expiration_date" name="expiration_date" required />
-      </div>
-
-      <button type="submit">Add</button>
 
     </form>
   </div>
 
   <!-- Category Filter -->
-  <div class="filter-bar">
-    @for (cat of categories; track cat) {
-      <button
-        [class.active]="selectedCategory === cat"
-        (click)="selectedCategory = cat">
-        {{ cat }}
-      </button>
-    }
+  <div class="filter-section">
+    <h3>📂 Filter by Category</h3>
+    <div class="filter-buttons">
+      @for (cat of categories; track cat) {
+        <button
+          [class.active]="selectedCategory === cat"
+          (click)="selectedCategory = cat"
+          class="filter-btn">
+          {{ cat }}
+        </button>
+      }
+    </div>
   </div>
 
   <!-- Pantry List -->
-  <div class="pantry-grid">
-    @for (entry of filteredPantry; track entry.id) {
-      <div class="pantry-card">
-        <div class="pantry-card-header">
-          <span class="item-name">{{ entry.item_name }}</span>
-          <span class="category-badge">{{ entry.item_category }}</span>
-        </div>
-        <div class="pantry-card-body">
-          <span>{{ entry.quantity }} {{ entry.unit }}</span>
-          <span class="expiry">Expires: {{ entry.expiration_date }}</span>
-        </div>
-        <button class="delete-btn" (click)="deleteEntry(entry.id)">Remove</button>
-      </div>
-    }
-    @empty {
-      <p class="empty">No items found in this category.</p>
-    }
-  </div>
+  <div class="pantry-section">
+    <h3>Your Pantry Items</h3>
 
+    <div class="pantry-grid">
+      @for (entry of filteredPantry; track entry.id) {
+        <div class="pantry-card">
+          <div class="card-icon">
+            <span class="item-emoji">📦</span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-header">
+              <span class="item-name">{{ entry.item_name }}</span>
+              <span class="category-badge">{{ entry.item_category }}</span>
+            </div>
+
+            <div class="card-details">
+              <div class="quantity-info">
+                <span class="quantity">{{ entry.quantity }}</span>
+                <span class="unit">{{ entry.unit }}</span>
+              </div>
+              <div class="expiry-info">
+                <span class="expiry-label">Expires:</span>
+                <span class="expiry-date" [class.expired]="isExpired(entry.expiration_date)" [class.expiring-soon]="isExpiringSoon(entry.expiration_date)">
+                  {{ entry.expiration_date }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="delete-btn" (click)="deleteEntry(entry.id)" title="Remove from pantry">
+              <span class="delete-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+      }
+      @empty {
+        <div class="empty-state">
+          <span class="empty-icon">📦</span>
+          <h4>No items found</h4>
+          <p>Your pantry is empty in this category. Add some items to get started!</p>
+        </div>
+      }
+    </div>
+  </div>
 </div>

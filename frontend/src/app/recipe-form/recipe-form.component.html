@@ -1,86 +1,205 @@
 <div class="form-container">
-  <h2>{{ isEditMode ? 'Edit Recipe' : 'Add Recipe' }}</h2>
-
-  <div class="form-group">
-    <label>Title</label>
-    <input [(ngModel)]="recipe.title" name="title" placeholder="Recipe title" required />
-  </div>
-
-  <div class="form-group">
-    <label>Description</label>
-    <input [(ngModel)]="recipe.description" name="description" placeholder="Short description" />
-  </div>
-
-  
-  <label>Category:</label>
-  <select [(ngModel)]="recipe.category">
-    <option *ngFor="let category of recipeCategories" [value]="category.value">
-      {{ category.label }}
-    </option>
-  </select>
-
- <label>Servings:</label>
-  <input type="number" [(ngModel)]="recipe.servings" placeholder="Servings" min="1">
-
-
-  <div class="form-group">
-    <label>Instructions</label>
-    <textarea [(ngModel)]="recipe.instructions" name="instructions" placeholder="Step by step instructions"></textarea>
-  </div>
-
-  <div class="form-group">
-    <label>Image</label>
-    <input type="file" (change)="onFileChange($event, 'image')" />
-  </div>
-
-  <div class="form-group">
-    <label>PDF</label>
-    <input type="file" (change)="onFileChange($event, 'pdf_file')" />
-  </div>
-
-  <!-- Ingredient Search -->
-  <div class="form-group">
-    <label>Ingredients</label>
-    <div class="search-wrapper">
-      <input
-        type="text"
-        [(ngModel)]="ingredientSearch"
-        name="ingredientSearch"
-        placeholder="Search ingredient..."
-        (input)="onSearchInput()"
-        (focus)="showSuggestions = true"
-        (blur)="showSuggestions = false"
-        autocomplete="off"
-      />
-      <ul *ngIf="showSuggestions && suggestions.length > 0" class="suggestions">
-        <li *ngFor="let s of suggestions" (mousedown)="selectIngredient(s)">
-          {{ s.name }} <span>{{ s.category }}</span>
-        </li>
-      </ul>
+  <div class="form-card">
+    <div class="form-header">
+      <h2>{{ isEditMode ? '✏️ Edit Recipe' : '➕ Add New Recipe' }}</h2>
+      <p>{{ isEditMode ? 'Update your delicious recipe' : 'Share your culinary masterpiece with the world' }}</p>
     </div>
-  </div>
 
-  <!-- Selected Ingredients Tags -->
-  <div *ngIf="selectedIngredients.length > 0" class="tags">
-    <div *ngFor="let ing of selectedIngredients" class="tag">
-      <span class="tag-name">{{ ing.name }}</span>
-      <input
-        type="number"
-        [(ngModel)]="ing.quantity"
-        [name]="'qty_' + ing.ingredient"
-        placeholder="qty"
-        min="0"
-        step="0.1"
-        required
-      />
-      <select [(ngModel)]="ing.unit" [name]="'unit_' + ing.ingredient" required class="unit-select">
-        <option *ngFor="let unit of ing.allowed_units" [value]="unit">{{ unit }}</option>
-      </select>
-      <button type="button" (click)="removeIngredient(ing.ingredient)">✕</button>
-    </div>
-  </div>
+    <form class="recipe-form">
 
-  <button class="submit-btn" (click)="submit()">
-    {{ isEditMode ? 'Update' : 'Add Recipe' }}
-  </button>
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3 class="section-title">📋 Basic Information</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="title">Recipe Title</label>
+            <input
+              id="title"
+              [(ngModel)]="recipe.title"
+              name="title"
+              placeholder="Enter recipe title..."
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              [(ngModel)]="recipe.category"
+              name="category"
+              class="form-select"
+            >
+              <option *ngFor="let category of recipeCategories" [value]="category.value">
+                {{ category.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="servings">Servings</label>
+            <input
+              id="servings"
+              type="number"
+              [(ngModel)]="recipe.servings"
+              name="servings"
+              placeholder="Number of servings"
+              min="1"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="recipe.description"
+            name="description"
+            placeholder="Describe your recipe..."
+            class="form-textarea"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Instructions Section -->
+      <div class="form-section">
+        <h3 class="section-title">📝 Instructions</h3>
+        <div class="form-group">
+          <textarea
+            [(ngModel)]="recipe.instructions"
+            name="instructions"
+            placeholder="Step by step cooking instructions..."
+            class="form-textarea instructions-textarea"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- File Uploads Section -->
+      <div class="form-section">
+        <h3 class="section-title">📎 Media & Files</h3>
+
+        <div class="file-upload-grid">
+          <div class="file-upload-item">
+            <label for="image">Recipe Image</label>
+            <div class="file-input-wrapper">
+              <input
+                id="image"
+                type="file"
+                (change)="onFileChange($event, 'image')"
+                accept="image/*"
+                class="file-input"
+              />
+              <div class="file-input-label">
+                <span class="file-icon">📷</span>
+                <span>Choose Image</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-upload-item">
+            <label for="pdf">Recipe PDF</label>
+            <div class="file-input-wrapper">
+              <input
+                id="pdf"
+                type="file"
+                (change)="onFileChange($event, 'pdf_file')"
+                accept="application/pdf"
+                class="file-input"
+              />
+              <div class="file-input-label">
+                <span class="file-icon">📄</span>
+                <span>Choose PDF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      <div class="form-section">
+        <h3 class="section-title">🍎 Ingredients</h3>
+
+        <!-- Ingredient Search -->
+        <div class="ingredient-search-section">
+          <div class="search-wrapper">
+            <input
+              type="text"
+              [(ngModel)]="ingredientSearch"
+              name="ingredientSearch"
+              placeholder="Search for ingredients..."
+              (input)="onSearchInput()"
+              (focus)="showSuggestions = true"
+              (blur)="showSuggestions = false"
+              autocomplete="off"
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+            <ul *ngIf="showSuggestions && suggestions.length > 0" class="suggestions">
+              <li *ngFor="let s of suggestions" (mousedown)="selectIngredient(s)" class="suggestion-item">
+                {{ s.name }}
+                <span class="category-badge">{{ s.category }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Selected Ingredients -->
+        <div *ngIf="selectedIngredients.length > 0" class="selected-ingredients">
+          <h4>Selected Ingredients</h4>
+          <div class="ingredients-grid">
+            <div *ngFor="let ing of selectedIngredients" class="ingredient-card">
+              <div class="ingredient-header">
+                <span class="ingredient-name">{{ ing.name }}</span>
+                <button type="button" (click)="removeIngredient(ing.ingredient)" class="remove-btn" title="Remove ingredient">
+                  ✕
+                </button>
+              </div>
+
+              <div class="ingredient-details">
+                <div class="input-group">
+                  <label>Quantity</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="ing.quantity"
+                    [name]="'qty_' + ing.ingredient"
+                    placeholder="0"
+                    min="0"
+                    step="0.1"
+                    required
+                    class="quantity-input"
+                  />
+                </div>
+
+                <div class="input-group">
+                  <label>Unit</label>
+                  <select
+                    [(ngModel)]="ing.unit"
+                    [name]="'unit_' + ing.ingredient"
+                    required
+                    class="unit-select"
+                  >
+                    <option *ngFor="let unit of ing.allowed_units" [value]="unit">{{ unit }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-actions">
+        <button type="button" class="submit-btn" (click)="submit()">
+          <span class="btn-icon">{{ isEditMode ? '💾' : '➕' }}</span>
+          {{ isEditMode ? 'Update Recipe' : 'Create Recipe' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>
