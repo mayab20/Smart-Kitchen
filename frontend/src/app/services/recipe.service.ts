@@ -39,7 +39,7 @@ export class RecipeService {
   }
 
   getRecipe(id: number): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.apiUrl}${id}/`, this.headers);
+    return this.http.get<Recipe>(`${this.apiUrl}${id}/`);
   }
 
   addRecipe(data: any): Observable<any> {
