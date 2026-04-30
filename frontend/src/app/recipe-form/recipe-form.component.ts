@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RecipeService } from '../services/recipe.service';
+import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -46,9 +47,14 @@ export class RecipeFormComponent implements OnInit {
 
   constructor(
     private recipeService: RecipeService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   ngOnInit() {
     this.recipeId = this.route.snapshot.params['id'];
@@ -157,6 +163,14 @@ export class RecipeFormComponent implements OnInit {
 
     request.subscribe(() => {
       this.router.navigate(['/']);
+    }, err => {
+      console.error('Save failed:', err);
+      if (err.status === 401 || err.status === 403) {
+        alert('You must be logged in to save recipes.');
+        this.router.navigate(['/login']);
+      } else {
+        alert('Failed to save recipe. Check console for details.');
+      }
     });
   }
 }

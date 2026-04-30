@@ -43,7 +43,7 @@ export class RecipeService {
   }
 
   addRecipe(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+    return this.http.post(this.apiUrl, data, this.headers);
   }
 
   deleteRecipe(id: number): Observable<any> {

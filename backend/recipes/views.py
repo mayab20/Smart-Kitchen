@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from pantries.models import Pantry
@@ -15,7 +15,7 @@ from .serializers import RecipeSerializer
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def _extract_ingredients_data(self, data):
@@ -53,6 +53,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
+        data['created_by'] = request.user.id if request.user.is_authenticated else None
         ingredients_data = self._extract_ingredients_data(data)
 
         serializer = self.get_serializer(data=data)
@@ -60,7 +61,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        recipe = serializer.save()
+        recipe = serializer.save(created_by=request.user if request.user.is_authenticated else None)
         if ingredients_data is not None:
             self._save_ingredients(recipe, ingredients_data)
 

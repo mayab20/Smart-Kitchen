@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RecipeService } from '../services/recipe.service';
+import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,6 +40,7 @@ export class RecipeDetailComponent implements OnInit {
 
   constructor(
     private recipeService: RecipeService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -227,7 +229,12 @@ export class RecipeDetailComponent implements OnInit {
       },
       error: err => {
         console.error('Cook failed:', err);
-        this.cookError = err.error?.detail || 'Unable to cook with current pantry stock.';
+        if (err.status === 401 || err.status === 403) {
+          this.cookError = 'You must be logged in to cook a recipe.';
+          this.router.navigate(['/login']);
+        } else {
+          this.cookError = err.error?.detail || 'Unable to cook with current pantry stock.';
+        }
       }
     });
   }
@@ -288,7 +295,12 @@ export class RecipeDetailComponent implements OnInit {
       });
     }, err => {
       console.error('Update failed:', err);
-      alert('Failed to save recipe. Check console for details.');
+      if (err.status === 401 || err.status === 403) {
+        alert('You must be logged in and own this recipe to edit it.');
+        this.router.navigate(['/login']);
+      } else {
+        alert('Failed to save recipe. Check console for details.');
+      }
     });
   }
 
@@ -303,7 +315,12 @@ export class RecipeDetailComponent implements OnInit {
         this.router.navigate(['/']);
       }, err => {
         console.error('Delete failed:', err);
-        alert('Could not delete recipe.');
+        if (err.status === 401 || err.status === 403) {
+          alert('You must be logged in and own this recipe to delete it.');
+          this.router.navigate(['/login']);
+        } else {
+          alert('Could not delete recipe.');
+        }
       });
     }
   }
