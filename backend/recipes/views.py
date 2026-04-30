@@ -18,6 +18,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='my-recipes')
+    def my_recipes(self, request):
+        recipes = self.get_queryset().filter(created_by=request.user)
+        serializer = self.get_serializer(recipes, many=True)
+        return Response(serializer.data)
+
     def _extract_ingredients_data(self, data):
         ingredients_data = data.get('ingredients_data', None)
         if ingredients_data is None:
@@ -70,7 +76,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        if instance.created_by_id != request.user.id:
+            return Response({'detail': 'You can only edit your own recipes.'}, status=status.HTTP_403_FORBIDDEN)
+
         data = request.data.copy()
+        data.pop('created_by', None)
         if data.get('image', None) == '':
             data['image'] = None
         if data.get('pdf_file', None) == '':
@@ -87,6 +97,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             self._save_ingredients(recipe, ingredients_data)
 
         return Response(self.get_serializer(recipe).data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.created_by_id != request.user.id:
+            return Response({'detail': 'You can only delete your own recipes.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
 
     def _parse_quantity(self, value):
         if value is None:

@@ -51,7 +51,17 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return this.accessToken;
+    if (this.accessToken) {
+      return this.accessToken;
+    }
+
+    const storedToken = localStorage.getItem('accessToken');
+    if (storedToken && storedToken !== 'null' && storedToken !== 'undefined') {
+      this.accessToken = storedToken;
+      return storedToken;
+    }
+
+    return null;
   }
 
 }

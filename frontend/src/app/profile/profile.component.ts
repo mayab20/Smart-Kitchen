@@ -22,9 +22,19 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.recipeService.getMyRecipes().subscribe({
       next: data => this.myRecipes = data,
-      error: err => console.error('Failed to load recipes:', err)
+      error: err => {
+        console.error('Failed to load recipes:', err);
+        if (err.status === 401 || err.status === 403) {
+          this.router.navigate(['/login']);
+        }
+      }
     });
   }
 
