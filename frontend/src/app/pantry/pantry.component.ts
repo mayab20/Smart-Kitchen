@@ -99,7 +99,7 @@ export class PantryComponent implements OnInit {
         ...new Set(data.map((e: any) => e.item.category).filter(Boolean)),
       ] as string[];
       this.categories = ['ALL', ...cats];
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     });
   }
 
@@ -138,26 +138,17 @@ export class PantryComponent implements OnInit {
     }
 
     if (!this.newEntry.expiration_date) {
-      this.addError = 'Please enter an expiration date.';
+      this.addError = 'Please enter expiration date.';
       return;
     }
 
     this.pantryService.addToPantry(this.newEntry).subscribe({
       next: () => {
-        this.loadPantry();
-        this.newEntry = {
-          item: null,
-          quantity: 1,
-          unit: 'NONE',
-          expiration_date: '',
-        };
-        this.itemSearch = '';
-        this.selectedItemUnits = [];
-        this.addError = null;
+        this.resetForm();
+        this.loadPantry(); 
       },
-      error: (err) => {
-        this.addError = 'Failed to add item. Please try again.';
-        console.error(err);
+      error: () => {
+        this.addError = 'Failed to add item.';
       },
     });
   }
@@ -189,4 +180,24 @@ export class PantryComponent implements OnInit {
   deleteEntry(id: number) {
     this.pantryService.deleteFromPantry(id).subscribe(() => this.loadPantry());
   }
+
+  updateQuantity(id: number, quantity: number) {
+    this.pantryService.updateQuantity(id, quantity).subscribe(() => {
+      this.loadPantry();
+    });
+  }
+  
+  private resetForm() {
+    this.newEntry = {
+      item: null,
+      quantity: 1,
+      unit: 'NONE',
+      expiration_date: '',
+    };
+
+    this.itemSearch = '';
+    this.selectedItemUnits = [];
+    this.addError = null;
+  }
+
 }

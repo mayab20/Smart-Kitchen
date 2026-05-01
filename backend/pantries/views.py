@@ -1,5 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import QuerySet
 from .models import Pantry
 from .serializers import PantrySerializer
 
@@ -8,8 +11,7 @@ class PantryViewSet(viewsets.ModelViewSet):
     serializer_class = PantrySerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        # each user sees only their own pantry
+    def get_queryset(self) -> QuerySet[Pantry]:
         return Pantry.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):

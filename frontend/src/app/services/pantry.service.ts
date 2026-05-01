@@ -27,6 +27,23 @@ export class PantryService {
     return this.http.post(`${this.apiUrl}/pantries/pantry/`, data, this.headers);
   }
 
+  updatePantryItem(id: number, data: any): Observable<any> {
+    return this.http.patch(
+      `${this.apiUrl}/pantries/pantry/${id}/`,
+      data,
+      this.headers
+    );
+  }
+
+  updateQuantity(id: number, quantity: number): Observable<any> {
+    return this.http.patch(
+      `${this.apiUrl}/pantries/pantry/${id}/`,
+      { quantity },
+      this.headers
+    );
+  }
+
+
   deleteFromPantry(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/pantries/pantry/${id}/`, this.headers);
   }

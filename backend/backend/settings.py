@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,12 +87,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_db',
-        'USER': 'django_user',
-        'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+      'ENGINE':'django.db.backends.mysql',
+      'NAME':os.getenv('NAME'),
+      'USER':os.getenv('USER'),
+      'PASSWORD':os.getenv('PASSWORD'),
+      'HOST':os.getenv('HOST'),
+      'PORT':os.getenv('PORT'),
+      'OPTIONS': {
+            'ssl': {
+                'ca': os.getenv('CA'),
+            }
+        }
     }
 }
 
@@ -135,6 +142,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+}
+
+# Configure token lifetimes for djangorestframework-simplejwt
+# Increase `ACCESS_TOKEN_LIFETIME` if access tokens are expiring too quickly.
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
 }
 
 # Static files (CSS, JavaScript, Images)
