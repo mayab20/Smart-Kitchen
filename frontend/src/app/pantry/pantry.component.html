@@ -1,7 +1,9 @@
 <div class="pantry-container">
   <div class="pantry-header">
     <h2>My Pantry</h2>
-    <p>Keep track of your ingredients and never run out of cooking essentials</p>
+    <p>
+      Keep track of your ingredients and never run out of cooking essentials
+    </p>
   </div>
 
   <!-- Add Item Form -->
@@ -9,7 +11,6 @@
     <h3>Add to Pantry</h3>
 
     <form (ngSubmit)="addEntry()" class="add-form">
-
       <div class="form-row">
         <div class="form-group search-group">
           <label>Item Name</label>
@@ -82,7 +83,6 @@
           Add to Pantry
         </button>
       </div>
-
     </form>
   </div>
 
@@ -93,15 +93,47 @@
   <!-- Category Filter -->
   <div class="filter-section">
     <h3>📂 Filter by Category</h3>
-    <div class="filter-buttons">
-      @for (cat of categories; track cat) {
-        <button
-          [class.active]="selectedCategory === cat"
-          (click)="selectedCategory = cat"
-          class="filter-btn">
-          {{ cat }}
-        </button>
-      }
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="categorySelect">Category</label>
+        <select
+          id="categorySelect"
+          [(ngModel)]="selectedCategory"
+          name="selectedCategory"
+          class="filter-select"
+        >
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group date-group">
+        <label for="expiresAfter">Expires After</label>
+        <input
+          id="expiresAfter"
+          type="date"
+          [(ngModel)]="expiresAfter"
+          name="expiresAfter"
+          class="date-input"
+        />
+      </div>
+
+      <div class="filter-group date-group">
+        <label for="expiresBefore">Expires Before</label>
+        <input
+          id="expiresBefore"
+          type="date"
+          [(ngModel)]="expiresBefore"
+          name="expiresBefore"
+          class="date-input"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button class="apply-btn" (click)="applyFilters()">Apply</button>
+        <button class="clear-btn" (click)="clearFilters()">Clear</button>
+      </div>
     </div>
   </div>
 
@@ -129,7 +161,11 @@
               </div>
               <div class="expiry-info">
                 <span class="expiry-label">Expires:</span>
-                <span class="expiry-date" [class.expired]="isExpired(entry.expiration_date)" [class.expiring-soon]="isExpiringSoon(entry.expiration_date)">
+                <span
+                  class="expiry-date"
+                  [class.expired]="isExpired(entry.expiration_date)"
+                  [class.expiring-soon]="isExpiringSoon(entry.expiration_date)"
+                >
                   {{ entry.expiration_date }}
                 </span>
               </div>
@@ -137,17 +173,23 @@
           </div>
 
           <div class="card-actions">
-            <button class="delete-btn" (click)="deleteEntry(entry.id)" title="Remove from pantry">
+            <button
+              class="delete-btn"
+              (click)="deleteEntry(entry.id)"
+              title="Remove from pantry"
+            >
               <span class="delete-icon">🗑️</span>
             </button>
           </div>
         </div>
-      }
-      @empty {
+      } @empty {
         <div class="empty-state">
           <span class="empty-icon">📦</span>
           <h4>No items found</h4>
-          <p>Your pantry is empty in this category. Add some items to get started!</p>
+          <p>
+            Your pantry is empty in this category. Add some items to get
+            started!
+          </p>
         </div>
       }
     </div>

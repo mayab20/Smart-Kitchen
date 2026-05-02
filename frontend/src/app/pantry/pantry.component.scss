@@ -66,25 +66,32 @@
   margin-bottom: var(--sk-space-6);
 }
 
-.filter-buttons {
+.filter-row {
   display: flex;
+  gap: var(--sk-space-4);
+  align-items: end;
   flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
   gap: var(--sk-space-2);
 }
 
-.filter-btn {
-  min-height: 38px;
-  padding: 0 var(--sk-space-4);
-  background: var(--sk-surface);
-  border-color: var(--sk-border);
-  color: var(--sk-text-muted);
+.filter-select {
+  min-width: 180px;
+  padding: 8px 10px;
 }
 
-.filter-btn.active,
-.filter-btn:hover {
-  background: var(--sk-accent-soft);
-  border-color: var(--sk-accent);
-  color: var(--sk-accent);
+.date-group .date-input {
+  width: 140px;
+  padding: 6px 8px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--sk-space-2);
 }
 
 .pantry-section h3 {

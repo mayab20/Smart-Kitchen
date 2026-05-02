@@ -17,6 +17,8 @@ export class PantryComponent implements OnInit {
   suggestions: any[] = [];
   categories: string[] = [];
   selectedCategory = 'ALL';
+  expiresBefore = '';
+  expiresAfter = '';
 
   selectedItemUnits: string[] = [];
   itemSearch = '';
@@ -66,7 +68,7 @@ export class PantryComponent implements OnInit {
 
   constructor(
     private pantryService: PantryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -76,7 +78,7 @@ export class PantryComponent implements OnInit {
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        switchMap((query) => this.pantryService.searchItems(query))
+        switchMap((query) => this.pantryService.searchItems(query)),
       )
       .subscribe({
         next: (data) => (this.suggestions = data),
@@ -93,10 +95,25 @@ export class PantryComponent implements OnInit {
   }
 
   loadPantry() {
-    this.pantryService.getPantry().subscribe((data) => {
+    const filters: any = {};
+    if (this.selectedCategory && this.selectedCategory !== 'ALL')
+      filters.category = this.selectedCategory;
+    if (this.expiresBefore) filters.expires_before = this.expiresBefore;
+    if (this.expiresAfter) filters.expires_after = this.expiresAfter;
+
+    this.pantryService.getPantry(filters).subscribe((data) => {
       this.pantryItems = [...data];
       const cats = [
-        ...new Set(data.map((e: any) => e.item.category).filter(Boolean)),
+        ...new Set(
+          data
+            .map(
+              (e: any) =>
+                e.item_category ||
+                e.item?.category ||
+                e.item?.category?.toString(),
+            )
+            .filter(Boolean),
+        ),
       ] as string[];
       this.categories = ['ALL', ...cats];
       this.cdr.markForCheck();
@@ -106,8 +123,20 @@ export class PantryComponent implements OnInit {
   get filteredPantry() {
     if (this.selectedCategory === 'ALL') return this.pantryItems;
     return this.pantryItems.filter(
-      (entry) => entry.category === this.selectedCategory
+      (entry) =>
+        (entry.item_category || entry.item?.category) === this.selectedCategory,
     );
+  }
+
+  applyFilters() {
+    this.loadPantry();
+  }
+
+  clearFilters() {
+    this.selectedCategory = 'ALL';
+    this.expiresBefore = '';
+    this.expiresAfter = '';
+    this.loadPantry();
   }
 
   selectItem(item: any) {
@@ -119,16 +148,6 @@ export class PantryComponent implements OnInit {
     this.selectedItemUnits = item.allowed_units ?? [];
     this.addError = null; // Clear error if user selects an item
   }
-
-  // getItemName(itemId: number): string {
-  //   return (
-  //     this.pantryItems.find((e) => e.item === itemId)? name ?? 'Unknown'
-  //   );
-  // }
-
-  // getItemCategory(itemId: number): string {
-  //   return this.pantryItems.find((e) => e.item === itemId)?.category ?? '';
-  // }
 
   addEntry() {
     // Prevent submission if item is not selected
@@ -145,7 +164,7 @@ export class PantryComponent implements OnInit {
     this.pantryService.addToPantry(this.newEntry).subscribe({
       next: () => {
         this.resetForm();
-        this.loadPantry(); 
+        this.loadPantry();
       },
       error: () => {
         this.addError = 'Failed to add item.';
@@ -186,7 +205,7 @@ export class PantryComponent implements OnInit {
       this.loadPantry();
     });
   }
-  
+
   private resetForm() {
     this.newEntry = {
       item: null,
@@ -199,5 +218,4 @@ export class PantryComponent implements OnInit {
     this.selectedItemUnits = [];
     this.addError = null;
   }
-
 }
