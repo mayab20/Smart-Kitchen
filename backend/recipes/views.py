@@ -7,13 +7,20 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.db.models import Prefetch
 
 from pantries.models import Pantry
 from .models import Recipe, RecipeIngredient
 from .serializers import RecipeSerializer
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
+    # Prefetch ingredients and their related ingredient row to avoid N+1 queries
+    queryset = Recipe.objects.all().select_related('created_by').prefetch_related(
+        Prefetch(
+            'recipeingredient_set',
+            queryset=RecipeIngredient.objects.select_related('ingredient')
+        )
+    )
     serializer_class = RecipeSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -115,6 +122,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], url_path='cook')
     def cook(self, request, pk=None):
+        # get_object() will use the viewset queryset with prefetch to avoid extra queries
         recipe = self.get_object()
         try:
             servings = float(request.data.get('servings', recipe.servings))
@@ -128,15 +136,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         insufficient = []
         updates = []
 
-        for ingredient in recipe.recipeingredient_set.all():
+        ingredients = list(recipe.recipeingredient_set.all())
+        # Batch fetch pantries for all ingredient items for this user
+        ingredient_items = [ing.ingredient_id for ing in ingredients]
+        pantry_qs = Pantry.objects.filter(user=request.user, item_id__in=ingredient_items).select_related('item')
+        # Build a lookup by (item_id, unit_lower or '')
+        pantry_map = {}
+        for p in pantry_qs:
+            key = (p.item_id, (p.unit or '').strip().lower())
+            pantry_map.setdefault(key, p)
+
+        for ingredient in ingredients:
             required_qty = self._parse_quantity(ingredient.quantity) * multiplier
-            filters = {
-                'user': request.user,
-                'item': ingredient.ingredient,
-            }
-            if ingredient.unit:
-                filters['unit__iexact'] = ingredient.unit
-            pantry = Pantry.objects.filter(**filters).first()
+            unit_key = (ingredient.ingredient_id, (ingredient.unit or '').strip().lower())
+            pantry = pantry_map.get(unit_key)
+            # fallback: any pantry for the item regardless of unit
+            if pantry is None:
+                pantry = pantry_map.get((ingredient.ingredient_id, ''))
+
             available_qty = pantry.quantity if pantry else 0
             if pantry is None or available_qty < required_qty:
                 insufficient.append({
