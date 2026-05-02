@@ -27,16 +27,20 @@
               class="search-input"
             />
             <span class="search-icon">🔍</span>
-            @if (showSuggestions && suggestions.length > 0) {
-              <ul class="suggestions">
-                @for (s of suggestions; track s.id) {
-                  <li (mousedown)="selectItem(s)" class="suggestion-item">
-                    {{ s.name }}
-                    <span class="category-badge">{{ s.category }}</span>
-                  </li>
-                }
-              </ul>
-            }
+
+            <ul
+              *ngIf="showSuggestions && suggestions.length > 0"
+              class="suggestions"
+            >
+              <li
+                *ngFor="let s of suggestions"
+                (mousedown)="selectItem(s)"
+                class="suggestion-item"
+              >
+                {{ s.name }}
+                <span class="category-badge">{{ s.category }}</span>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -59,9 +63,9 @@
         <div class="form-group">
           <label>Unit</label>
           <select [(ngModel)]="newEntry.unit" name="unit" class="form-select">
-            @for (unit of selectedItemUnits; track unit) {
-              <option [value]="unit">{{ unit }}</option>
-            }
+            <option *ngFor="let unit of selectedItemUnits" [value]="unit">
+              {{ unit }}
+            </option>
           </select>
         </div>
 
@@ -86,9 +90,7 @@
     </form>
   </div>
 
-  @if (addError) {
-    <p class="error">{{ addError }}</p>
-  }
+  <p *ngIf="addError" class="error">{{ addError }}</p>
 
   <!-- Category Filter -->
   <div class="filter-section">
@@ -102,9 +104,9 @@
           name="selectedCategory"
           class="filter-select"
         >
-          @for (cat of categories; track cat) {
-            <option [value]="cat">{{ cat }}</option>
-          }
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ cat }}
+          </option>
         </select>
       </div>
 
@@ -141,57 +143,56 @@
   <div class="pantry-section">
     <h3>Your Pantry Items</h3>
 
-    <div class="pantry-grid">
-      @for (entry of filteredPantry; track entry.id) {
-        <div class="pantry-card">
-          <div class="card-icon">
-            <span class="item-emoji">📦</span>
+    <div *ngIf="isLoading" class="loading">Loading pantry...</div>
+
+    <div *ngIf="!isLoading && filteredPantry.length > 0" class="pantry-grid">
+      <div *ngFor="let entry of filteredPantry" class="pantry-card">
+        <div class="card-icon">
+          <span class="item-emoji">📦</span>
+        </div>
+
+        <div class="card-content">
+          <div class="card-header">
+            <span class="item-name">{{ entry.item_name }}</span>
+            <span class="category-badge">{{ entry.item_category }}</span>
           </div>
 
-          <div class="card-content">
-            <div class="card-header">
-              <span class="item-name">{{ entry.item_name }}</span>
-              <span class="category-badge">{{ entry.item_category }}</span>
+          <div class="card-details">
+            <div class="quantity-info">
+              <span class="quantity">{{ entry.quantity }}</span>
+              <span class="unit">{{ entry.unit }}</span>
             </div>
-
-            <div class="card-details">
-              <div class="quantity-info">
-                <span class="quantity">{{ entry.quantity }}</span>
-                <span class="unit">{{ entry.unit }}</span>
-              </div>
-              <div class="expiry-info">
-                <span class="expiry-label">Expires:</span>
-                <span
-                  class="expiry-date"
-                  [class.expired]="isExpired(entry.expiration_date)"
-                  [class.expiring-soon]="isExpiringSoon(entry.expiration_date)"
-                >
-                  {{ entry.expiration_date }}
-                </span>
-              </div>
+            <div class="expiry-info">
+              <span class="expiry-label">Expires:</span>
+              <span
+                class="expiry-date"
+                [class.expired]="isExpired(entry.expiration_date)"
+                [class.expiring-soon]="isExpiringSoon(entry.expiration_date)"
+              >
+                {{ entry.expiration_date }}
+              </span>
             </div>
-          </div>
-
-          <div class="card-actions">
-            <button
-              class="delete-btn"
-              (click)="deleteEntry(entry.id)"
-              title="Remove from pantry"
-            >
-              <span class="delete-icon">🗑️</span>
-            </button>
           </div>
         </div>
-      } @empty {
-        <div class="empty-state">
-          <span class="empty-icon">📦</span>
-          <h4>No items found</h4>
-          <p>
-            Your pantry is empty in this category. Add some items to get
-            started!
-          </p>
+
+        <div class="card-actions">
+          <button
+            class="delete-btn"
+            (click)="deleteEntry(entry.id)"
+            title="Remove from pantry"
+          >
+            <span class="delete-icon">🗑️</span>
+          </button>
         </div>
-      }
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && filteredPantry.length === 0" class="empty-state">
+      <span class="empty-icon">📦</span>
+      <h4>No items found</h4>
+      <p>
+        Your pantry is empty in this category. Add some items to get started!
+      </p>
     </div>
   </div>
 </div>

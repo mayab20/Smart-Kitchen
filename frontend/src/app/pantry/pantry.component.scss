@@ -172,6 +172,13 @@
   text-align: center;
 }
 
+.loading {
+  grid-column: 1 / -1;
+  padding: var(--sk-space-6);
+  text-align: center;
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   .form-row {
     grid-template-columns: 1fr;

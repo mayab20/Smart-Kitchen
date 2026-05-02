@@ -19,6 +19,7 @@ export class PantryComponent implements OnInit {
   selectedCategory = 'ALL';
   expiresBefore = '';
   expiresAfter = '';
+  isLoading = true;
 
   selectedItemUnits: string[] = [];
   itemSearch = '';
@@ -95,28 +96,32 @@ export class PantryComponent implements OnInit {
   }
 
   loadPantry() {
+    this.isLoading = true;
     const filters: any = {};
     if (this.selectedCategory && this.selectedCategory !== 'ALL')
       filters.category = this.selectedCategory;
     if (this.expiresBefore) filters.expires_before = this.expiresBefore;
     if (this.expiresAfter) filters.expires_after = this.expiresAfter;
 
-    this.pantryService.getPantry(filters).subscribe((data) => {
-      this.pantryItems = [...data];
-      const cats = [
-        ...new Set(
-          data
-            .map(
-              (e: any) =>
-                e.item_category ||
-                e.item?.category ||
-                e.item?.category?.toString(),
-            )
-            .filter(Boolean),
-        ),
-      ] as string[];
-      this.categories = ['ALL', ...cats];
-      this.cdr.markForCheck();
+    this.pantryService.getPantry(filters).subscribe({
+      next: (data) => {
+        this.pantryItems = [...data];
+        const cats = [
+          ...new Set(
+            data
+              .map((e: any) => e.item_category || e.item?.category)
+              .filter(Boolean),
+          ),
+        ] as string[];
+        this.categories = ['ALL', ...cats];
+        this.cdr.markForCheck();
+        this.isLoading = false;
+      },
+      error: () => {
+        this.pantryItems = [];
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -173,26 +178,18 @@ export class PantryComponent implements OnInit {
   }
 
   isExpired(expirationDate: string): boolean {
-    if (!expirationDate) {
-      return false;
-    }
-
+    if (!expirationDate) return false;
     const now = new Date();
     const expiry = new Date(expirationDate);
-
     return expiry < now;
   }
 
   isExpiringSoon(expirationDate: string): boolean {
-    if (!expirationDate) {
-      return false;
-    }
-
+    if (!expirationDate) return false;
     const now = new Date();
     const expiry = new Date(expirationDate);
     const diffMs = expiry.getTime() - now.getTime();
     const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
     return diffDays >= 0 && diffDays <= 3;
   }
 
@@ -213,7 +210,6 @@ export class PantryComponent implements OnInit {
       unit: 'NONE',
       expiration_date: '',
     };
-
     this.itemSearch = '';
     this.selectedItemUnits = [];
     this.addError = null;

@@ -9,11 +9,11 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './recipe.component.html',
-  styleUrl: './recipe.component.scss'
+  styleUrl: './recipe.component.scss',
 })
 export class RecipesComponent implements OnInit {
-
   recipes: any[] = [];
+  isLoading = true;
   selectedCategory = 'ALL';
 
   recipeCategories = [
@@ -24,13 +24,13 @@ export class RecipesComponent implements OnInit {
     { value: 'MAIN', label: 'Main Course' },
     { value: 'DESSERT', label: 'Dessert' },
     { value: 'DRINK', label: 'Drink' },
-    { value: 'OTHER', label: 'Other' }
+    { value: 'OTHER', label: 'Other' },
   ];
 
   newRecipe: any = {
     title: '',
     description: '',
-    instructions: ''
+    instructions: '',
   };
 
   constructor(private recipeService: RecipeService) {}
@@ -40,13 +40,21 @@ export class RecipesComponent implements OnInit {
   }
 
   onFileChange(event: any, field: string) {
-  const file = event.target.files[0];
-  this.newRecipe[field] = file;
-}
+    const file = event.target.files[0];
+    this.newRecipe[field] = file;
+  }
 
   loadRecipes() {
-    this.recipeService.getRecipes().subscribe((data: any[]) => {
-      this.recipes = data;
+    this.isLoading = true;
+    this.recipeService.getRecipes().subscribe({
+      next: (data: any[]) => {
+        this.recipes = data;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.recipes = [];
+        this.isLoading = false;
+      },
     });
   }
 
@@ -54,20 +62,22 @@ export class RecipesComponent implements OnInit {
     if (this.selectedCategory === 'ALL') {
       return this.recipes;
     }
-    return this.recipes.filter(recipe => recipe.category === this.selectedCategory);
+    return this.recipes.filter(
+      (recipe) => recipe.category === this.selectedCategory,
+    );
   }
 
   addRecipe() {
-  const formData = new FormData();
+    const formData = new FormData();
 
-  for (let key in this.newRecipe) {
-    formData.append(key, this.newRecipe[key]);
+    for (let key in this.newRecipe) {
+      formData.append(key, this.newRecipe[key]);
+    }
+
+    this.recipeService.addRecipe(formData).subscribe(() => {
+      this.loadRecipes();
+    });
   }
-
-  this.recipeService.addRecipe(formData).subscribe(() => {
-    this.loadRecipes();
-  });
-}
 
   deleteRecipe(id: number) {
     this.recipeService.deleteRecipe(id).subscribe(() => {
@@ -75,7 +85,7 @@ export class RecipesComponent implements OnInit {
     });
   }
 
-   getImageUrl(imagePath: string | null, category: string): string {
+  getImageUrl(imagePath: string | null, category: string): string {
     if (imagePath) {
       if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
         return imagePath;
@@ -102,7 +112,7 @@ export class RecipesComponent implements OnInit {
       MAIN: '/images/bibimbub-cooking-food-svgrepo-com.svg',
       DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
       DRINK: '/images/drink-soft-drink-svgrepo-com.svg',
-      OTHER: '/images/oden-svgrepo-com.svg'
+      OTHER: '/images/oden-svgrepo-com.svg',
     };
     return defaults[category] || defaults['OTHER'];
   }

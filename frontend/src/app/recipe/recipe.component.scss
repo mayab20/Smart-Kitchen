@@ -26,6 +26,15 @@
   text-align: center;
 }
 
+.empty-state .empty-icon,
+.no-recipes .empty-icon {
+  font-size: 2rem;
+}
+
+.no-recipes.loading .empty-state {
+  opacity: 0.9;
+}
+
 .empty-icon {
   display: block;
   margin-bottom: var(--sk-space-3);
@@ -34,7 +43,9 @@
 
 .recipe-card {
   overflow: hidden;
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
 
   &:hover {
     box-shadow: var(--sk-shadow-md);
