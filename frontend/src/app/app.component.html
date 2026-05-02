@@ -3,18 +3,19 @@
 
   <div class="links">
     <a routerLink="/">Home</a>
-
-    @if (authService.isLoggedIn()) {
+    <ng-container *ngIf="authService.isLoggedIn$ | async; else loggedOut">
       <a routerLink="/add">Add Recipe</a>
       <a routerLink="/pantry">My Pantry</a>
       <a routerLink="/profile">Profile</a>
-    } @else {
+      <a (click)="onLogout()">Logout</a>
+    </ng-container>
+    <ng-template #loggedOut>
       <a routerLink="/signup">Sign Up</a>
       <a routerLink="/login">Login</a>
-    }
+    </ng-template>
   </div>
 </nav>
 
-<hr>
+<hr />
 
 <router-outlet></router-outlet>

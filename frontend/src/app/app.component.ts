@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
@@ -13,7 +13,19 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
   title = 'frontend';
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  // ngOnInit() {
+  //   this.LoadApp();
+  // }
+
+  // LoadApp() {
+  //   this.authService.isLoggedIn().;
+  // }
 
   onLogout() {
     this.authService.logout().subscribe({
