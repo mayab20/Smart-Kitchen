@@ -100,4 +100,12 @@ export class RecipeService {
       params,
     });
   }
+
+  searchRecipesByTitle(query: string): Observable<Recipe[]> {
+  const params = new HttpParams().set('search', query || '');
+
+  return this.http.get<Recipe[]>(this.apiUrl, {
+    params,
+  });
+}
 }

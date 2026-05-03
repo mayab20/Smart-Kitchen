@@ -15,16 +15,20 @@ export class RecipesComponent implements OnInit {
   recipes: any[] = [];
   isLoading = true;
   selectedCategory = 'ALL';
+  searchTitle = '';
 
   recipeCategories = [
     { value: 'ALL', label: 'All' },
-    { value: 'SALAD', label: 'Salad' },
-    { value: 'SOUP', label: 'Soup' },
-    { value: 'APPETIZER', label: 'Appetizer' },
-    { value: 'MAIN', label: 'Main Course' },
+    { value: 'BREAKFAST', label: 'Breakfast' },
+    { value: 'LUNCH', label: 'Lunch' },
+    { value: 'DINNER', label: 'Dinner' },
+    { value: 'SNACK', label: 'Snack' },
     { value: 'DESSERT', label: 'Dessert' },
-    { value: 'DRINK', label: 'Drink' },
-    { value: 'OTHER', label: 'Other' },
+    { value: 'APPETIZER', label: 'Appetizer' },
+    { value: 'SIDE_DISH', label: 'Side Dish' },
+    { value: 'SOUP', label: 'Soup' },
+    { value: 'SALAD', label: 'Salad' },
+    { value: 'BEVERAGE', label: 'Beverage' },
   ];
 
   newRecipe: any = {
@@ -59,12 +63,19 @@ export class RecipesComponent implements OnInit {
   }
 
   get filteredRecipes() {
-    if (this.selectedCategory === 'ALL') {
-      return this.recipes;
-    }
-    return this.recipes.filter(
-      (recipe) => recipe.category === this.selectedCategory,
-    );
+    return this.recipes.filter((recipe) => {
+      const matchesCategory =
+        this.selectedCategory === 'ALL' ||
+        recipe.category === this.selectedCategory;
+
+      const matchesTitle =
+        !this.searchTitle.trim() ||
+        recipe.title
+          ?.toLowerCase()
+          .includes(this.searchTitle.toLowerCase().trim());
+
+      return matchesCategory && matchesTitle;
+    });
   }
 
   addRecipe() {
