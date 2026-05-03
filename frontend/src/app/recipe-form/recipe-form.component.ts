@@ -12,28 +12,27 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './recipe-form.component.html',
-  styleUrls: ['./recipe-form.component.scss']
+  styleUrls: ['./recipe-form.component.scss'],
 })
 export class RecipeFormComponent implements OnInit {
-
   recipe: any = {
     title: '',
     description: '',
-    category: 'OTHER',
-    servings: 1,
-    instructions: '',
-    image: null,
-    pdf_file: null
+    category: 'BREAKFAST',
+    pdf_file: null,
   };
 
-    recipeCategories = [
-    { value: 'SALAD', label: 'Salad' },
-    { value: 'SOUP', label: 'Soup' },
-    { value: 'APPETIZER', label: 'Appetizer' },
-    { value: 'MAIN', label: 'Main Course' },
+  recipeCategories = [
+    { value: 'BREAKFAST', label: 'Breakfast' },
+    { value: 'LUNCH', label: 'Lunch' },
+    { value: 'DINNER', label: 'Dinner' },
+    { value: 'SNACK', label: 'Snack' },
     { value: 'DESSERT', label: 'Dessert' },
-    { value: 'DRINK', label: 'Drink' },
-    { value: 'OTHER', label: 'Other' }
+    { value: 'APPETIZER', label: 'Appetizer' },
+    { value: 'SIDE_DISH', label: 'Side Dish' },
+    { value: 'SOUP', label: 'Soup' },
+    { value: 'SALAD', label: 'Salad' },
+    { value: 'BEVERAGE', label: 'Beverage' },
   ];
 
   selectedIngredients: any[] = [];
@@ -49,7 +48,7 @@ export class RecipeFormComponent implements OnInit {
     private recipeService: RecipeService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
@@ -61,31 +60,46 @@ export class RecipeFormComponent implements OnInit {
 
     if (this.recipeId) {
       this.isEditMode = true;
-      this.recipeService.getRecipes().subscribe(data => {
+      this.recipeService.getRecipes().subscribe((data) => {
         const found = data.find((r: any) => r.id == this.recipeId);
         if (found) {
           this.recipe = found;
           if (found.recipe_ingredients) {
-            this.selectedIngredients = found.recipe_ingredients.map((ri: any) => ({
-              ingredient: ri.ingredient,
-              name: ri.ingredient_name,
-              quantity: ri.quantity,
-              unit: ri.unit,
-              allowed_units: ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'] // Default units
-            }));
+            this.selectedIngredients = found.recipe_ingredients.map(
+              (ri: any) => ({
+                ingredient: ri.ingredient,
+                name: ri.ingredient_name,
+                quantity: ri.quantity,
+                unit: ri.unit,
+                allowed_units: [
+                  'g',
+                  'kg',
+                  'ml',
+                  'l',
+                  'cup',
+                  'tbsp',
+                  'tsp',
+                  'piece',
+                  'pinch',
+                  'slice',
+                ], // Default units
+              }),
+            );
           }
         }
       });
     }
 
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.recipeService.searchItems(query))
-    ).subscribe({
-      next: data => this.suggestions = data,
-      error: err => console.error('Search failed:', err)
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => this.recipeService.searchItems(query)),
+      )
+      .subscribe({
+        next: (data) => (this.suggestions = data),
+        error: (err) => console.error('Search failed:', err),
+      });
   }
 
   onSearchInput() {
@@ -97,15 +111,31 @@ export class RecipeFormComponent implements OnInit {
   }
 
   selectIngredient(item: any) {
-    const already = this.selectedIngredients.find(i => i.ingredient === item.id);
+    const already = this.selectedIngredients.find(
+      (i) => i.ingredient === item.id,
+    );
     if (!already) {
-      const allowedUnits = item.allowed_units && item.allowed_units.length > 0 ? item.allowed_units : ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'];
+      const allowedUnits =
+        item.allowed_units && item.allowed_units.length > 0
+          ? item.allowed_units
+          : [
+              'g',
+              'kg',
+              'ml',
+              'l',
+              'cup',
+              'tbsp',
+              'tsp',
+              'piece',
+              'pinch',
+              'slice',
+            ];
       this.selectedIngredients.push({
         ingredient: item.id,
         name: item.name,
         quantity: '',
         unit: allowedUnits[0],
-        allowed_units: allowedUnits
+        allowed_units: allowedUnits,
       });
     }
     this.ingredientSearch = '';
@@ -114,7 +144,9 @@ export class RecipeFormComponent implements OnInit {
   }
 
   removeIngredient(id: number) {
-    this.selectedIngredients = this.selectedIngredients.filter(i => i.ingredient !== id);
+    this.selectedIngredients = this.selectedIngredients.filter(
+      (i) => i.ingredient !== id,
+    );
   }
 
   onFileChange(event: any, field: string) {
@@ -142,17 +174,24 @@ export class RecipeFormComponent implements OnInit {
     }
 
     const formData = new FormData();
-    for (let key in this.recipe) {
-      const value = this.recipe[key];
-      if (value !== null && value !== undefined && value !== '') {
-        formData.append(key, value);
-      }
+    formData.append('title', this.recipe.title || '');
+    formData.append('description', this.recipe.description || '');
+    formData.append('category', this.recipe.category || 'BREAKFAST');
+    formData.append('servings', String(this.recipe.servings || 1));
+    formData.append('instructions', this.recipe.instructions || '');
+
+    if (this.recipe.image instanceof File) {
+      formData.append('image', this.recipe.image);
+    }
+
+    if (this.recipe.pdf_file instanceof File) {
+      formData.append('pdf_file', this.recipe.pdf_file);
     }
 
     const ingredientPayload = this.selectedIngredients.map((ing: any) => ({
       ingredient: ing.ingredient,
       quantity: ing.quantity,
-      unit: ing.unit
+      unit: ing.unit,
     }));
 
     formData.append('ingredients_data', JSON.stringify(ingredientPayload));
@@ -161,16 +200,19 @@ export class RecipeFormComponent implements OnInit {
       ? this.recipeService.updateRecipe(this.recipeId, formData)
       : this.recipeService.addRecipe(formData);
 
-    request.subscribe(() => {
-      this.router.navigate(['/']);
-    }, err => {
-      console.error('Save failed:', err);
-      if (err.status === 401 || err.status === 403) {
-        alert('You must be logged in to save recipes.');
-        this.router.navigate(['/login']);
-      } else {
-        alert('Failed to save recipe. Check console for details.');
-      }
-    });
+    request.subscribe(
+      () => {
+        this.router.navigate(['/']);
+      },
+      (err) => {
+        console.error('Save failed:', err);
+        if (err.status === 401 || err.status === 403) {
+          alert('You must be logged in to save recipes.');
+          this.router.navigate(['/login']);
+        } else {
+          alert('Failed to save recipe. Check console for details.');
+        }
+      },
+    );
   }
 }

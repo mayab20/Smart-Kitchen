@@ -66,7 +66,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
-        data['created_by'] = request.user.id if request.user.is_authenticated else None
         ingredients_data = self._extract_ingredients_data(data)
 
         serializer = self.get_serializer(data=data)

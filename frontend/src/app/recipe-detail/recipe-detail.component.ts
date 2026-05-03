@@ -12,10 +12,9 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './recipe-detail.component.html',
-  styleUrls: ['./recipe-detail.component.scss']
+  styleUrls: ['./recipe-detail.component.scss'],
 })
 export class RecipeDetailComponent implements OnInit {
-
   recipe: any;
   isEditing = false;
   removeImage = false;
@@ -28,13 +27,16 @@ export class RecipeDetailComponent implements OnInit {
   suggestions: any[] = [];
   ingredientSearch = '';
   recipeCategories = [
-    { value: 'SALAD', label: 'Salad' },
-    { value: 'SOUP', label: 'Soup' },
-    { value: 'APPETIZER', label: 'Appetizer' },
-    { value: 'MAIN', label: 'Main Course' },
+    { value: 'BREAKFAST', label: 'Breakfast' },
+    { value: 'LUNCH', label: 'Lunch' },
+    { value: 'DINNER', label: 'Dinner' },
+    { value: 'SNACK', label: 'Snack' },
     { value: 'DESSERT', label: 'Dessert' },
-    { value: 'DRINK', label: 'Drink' },
-    { value: 'OTHER', label: 'Other' }
+    { value: 'APPETIZER', label: 'Appetizer' },
+    { value: 'SIDE_DISH', label: 'Side Dish' },
+    { value: 'SOUP', label: 'Soup' },
+    { value: 'SALAD', label: 'Salad' },
+    { value: 'BEVERAGE', label: 'Beverage' },
   ];
   private searchSubject = new Subject<string>();
 
@@ -42,27 +44,29 @@ export class RecipeDetailComponent implements OnInit {
     private recipeService: RecipeService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const id = Number(this.route.snapshot.params['id']);
 
-    this.recipeService.getRecipe(id).subscribe(recipe => {
+    this.recipeService.getRecipe(id).subscribe((recipe) => {
       this.recipe = recipe;
       this.removeImage = false;
       this.removePdf = false;
       this.setupSelectedIngredients();
     });
 
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.recipeService.searchItems(query))
-    ).subscribe({
-      next: data => this.suggestions = data,
-      error: err => console.error('Search failed:', err)
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => this.recipeService.searchItems(query)),
+      )
+      .subscribe({
+        next: (data) => (this.suggestions = data),
+        error: (err) => console.error('Search failed:', err),
+      });
   }
 
   private setupSelectedIngredients() {
@@ -70,17 +74,33 @@ export class RecipeDetailComponent implements OnInit {
     if (!this.recipe?.recipe_ingredients) {
       return;
     }
-    this.selectedIngredients = this.recipe.recipe_ingredients.map((ri: any) => ({
-      ingredient: ri.ingredient,
-      name: ri.ingredient_name,
-      quantity: ri.quantity,
-      unit: ri.unit || ri.ingredient_unit || '',
-      allowed_units: ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice']
-    }));
+    this.selectedIngredients = this.recipe.recipe_ingredients.map(
+      (ri: any) => ({
+        ingredient: ri.ingredient,
+        name: ri.ingredient_name,
+        quantity: ri.quantity,
+        unit: ri.unit || ri.ingredient_unit || '',
+        allowed_units: [
+          'g',
+          'kg',
+          'ml',
+          'l',
+          'cup',
+          'tbsp',
+          'tsp',
+          'piece',
+          'pinch',
+          'slice',
+        ],
+      }),
+    );
   }
 
   getImageUrl(imagePath: string | null, category: string): string {
     if (imagePath) {
+      if (imagePath.startsWith('data:')) {
+        return imagePath;
+      }
       if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
         return imagePath;
       }
@@ -102,6 +122,9 @@ export class RecipeDetailComponent implements OnInit {
     if (!pdfPath) {
       return '';
     }
+    if (pdfPath.startsWith('data:')) {
+      return pdfPath;
+    }
     if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
       return pdfPath;
     }
@@ -119,19 +142,22 @@ export class RecipeDetailComponent implements OnInit {
 
   private getDefaultImage(category: string): string {
     const defaults: Record<string, string> = {
-      SALAD: '/images/salad-svgrepo-com.svg',
-      SOUP: '/images/soup-svgrepo-com.svg',
-      APPETIZER: '/images/starter-svgrepo-com.svg',
-      MAIN: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      BREAKFAST: '/images/breakfast-svgrepo-com.svg',
+      LUNCH: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      DINNER: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      SNACK: '/images/snack-svgrepo-com.svg',
       DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
-      DRINK: '/images/drink-soft-drink-svgrepo-com.svg',
-      OTHER: '/images/oden-svgrepo-com.svg'
+      APPETIZER: '/images/starter-svgrepo-com.svg',
+      SIDE_DISH: '/images/side-dish-svgrepo-com.svg',
+      SOUP: '/images/soup-svgrepo-com.svg',
+      SALAD: '/images/salad-svgrepo-com.svg',
+      BEVERAGE: '/images/drink-soft-drink-svgrepo-com.svg',
     };
-    return defaults[category] || defaults['OTHER'];
+    return defaults[category] || '/images/oden-svgrepo-com.svg';
   }
 
   getCategoryLabel(value: string): string {
-    const found = this.recipeCategories.find(cat => cat.value === value);
+    const found = this.recipeCategories.find((cat) => cat.value === value);
     return found ? found.label : value || 'Other';
   }
 
@@ -144,15 +170,31 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   selectIngredient(item: any) {
-    const already = this.selectedIngredients.find(i => i.ingredient === item.id);
+    const already = this.selectedIngredients.find(
+      (i) => i.ingredient === item.id,
+    );
     if (!already) {
-      const allowedUnits = item.allowed_units && item.allowed_units.length > 0 ? item.allowed_units : ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'];
+      const allowedUnits =
+        item.allowed_units && item.allowed_units.length > 0
+          ? item.allowed_units
+          : [
+              'g',
+              'kg',
+              'ml',
+              'l',
+              'cup',
+              'tbsp',
+              'tsp',
+              'piece',
+              'pinch',
+              'slice',
+            ];
       this.selectedIngredients.push({
         ingredient: item.id,
         name: item.name,
         quantity: '',
         unit: allowedUnits[0],
-        allowed_units: allowedUnits
+        allowed_units: allowedUnits,
       });
     }
     this.ingredientSearch = '';
@@ -160,7 +202,9 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   removeIngredient(id: number) {
-    this.selectedIngredients = this.selectedIngredients.filter(i => i.ingredient !== id);
+    this.selectedIngredients = this.selectedIngredients.filter(
+      (i) => i.ingredient !== id,
+    );
   }
 
   onFileChange(event: any, field: string) {
@@ -203,7 +247,9 @@ export class RecipeDetailComponent implements OnInit {
     if (value === null || value === undefined) {
       return 0;
     }
-    const match = String(value).trim().match(/^([0-9]+(?:[.,][0-9]+)?)/);
+    const match = String(value)
+      .trim()
+      .match(/^([0-9]+(?:[.,][0-9]+)?)/);
     if (!match) {
       return 0;
     }
@@ -223,7 +269,9 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   getCookAvailable(ing: any): boolean {
-    const needed = this.parseQuantity(ing.quantity) * (this.cookServings / (this.recipe?.servings || 1));
+    const needed =
+      this.parseQuantity(ing.quantity) *
+      (this.cookServings / (this.recipe?.servings || 1));
     return (ing.pantry_quantity || 0) >= needed;
   }
 
@@ -231,23 +279,24 @@ export class RecipeDetailComponent implements OnInit {
     this.cookError = '';
     this.cookMessage = '';
     this.recipeService.cookRecipe(this.recipe.id, this.cookServings).subscribe({
-      next: response => {
+      next: (response) => {
         this.cookMessage = response.detail || 'Cooked successfully';
         this.cookMode = false;
-        this.recipeService.getRecipe(this.recipe.id).subscribe(recipe => {
+        this.recipeService.getRecipe(this.recipe.id).subscribe((recipe) => {
           this.recipe = recipe;
           this.setupSelectedIngredients();
         });
       },
-      error: err => {
+      error: (err) => {
         console.error('Cook failed:', err);
         if (err.status === 401 || err.status === 403) {
           this.cookError = 'You must be logged in to cook a recipe.';
           this.router.navigate(['/login']);
         } else {
-          this.cookError = err.error?.detail || 'Unable to cook with current pantry stock.';
+          this.cookError =
+            err.error?.detail || 'Unable to cook with current pantry stock.';
         }
-      }
+      },
     });
   }
 
@@ -295,25 +344,28 @@ export class RecipeDetailComponent implements OnInit {
     const ingredientPayload = this.selectedIngredients.map((ing: any) => ({
       ingredient: ing.ingredient,
       quantity: ing.quantity,
-      unit: ing.unit
+      unit: ing.unit,
     }));
     formData.append('ingredients_data', JSON.stringify(ingredientPayload));
 
-    this.recipeService.updateRecipe(this.recipe.id, formData).subscribe(() => {
-      this.isEditing = false;
-      this.recipeService.getRecipe(this.recipe.id).subscribe(recipe => {
-        this.recipe = recipe;
-        this.setupSelectedIngredients();
-      });
-    }, err => {
-      console.error('Update failed:', err);
-      if (err.status === 401 || err.status === 403) {
-        alert('You must be logged in and own this recipe to edit it.');
-        this.router.navigate(['/login']);
-      } else {
-        alert('Failed to save recipe. Check console for details.');
-      }
-    });
+    this.recipeService.updateRecipe(this.recipe.id, formData).subscribe(
+      () => {
+        this.isEditing = false;
+        this.recipeService.getRecipe(this.recipe.id).subscribe((recipe) => {
+          this.recipe = recipe;
+          this.setupSelectedIngredients();
+        });
+      },
+      (err) => {
+        console.error('Update failed:', err);
+        if (err.status === 401 || err.status === 403) {
+          alert('You must be logged in and own this recipe to edit it.');
+          this.router.navigate(['/login']);
+        } else {
+          alert('Failed to save recipe. Check console for details.');
+        }
+      },
+    );
   }
 
   cancelEdit() {
@@ -323,17 +375,20 @@ export class RecipeDetailComponent implements OnInit {
 
   deleteRecipe() {
     if (confirm('Are you sure you want to delete this recipe?')) {
-      this.recipeService.deleteRecipe(this.recipe.id).subscribe(() => {
-        this.router.navigate(['/']);
-      }, err => {
-        console.error('Delete failed:', err);
-        if (err.status === 401 || err.status === 403) {
-          alert('You must be logged in and own this recipe to delete it.');
-          this.router.navigate(['/login']);
-        } else {
-          alert('Could not delete recipe.');
-        }
-      });
+      this.recipeService.deleteRecipe(this.recipe.id).subscribe(
+        () => {
+          this.router.navigate(['/']);
+        },
+        (err) => {
+          console.error('Delete failed:', err);
+          if (err.status === 401 || err.status === 403) {
+            alert('You must be logged in and own this recipe to delete it.');
+            this.router.navigate(['/login']);
+          } else {
+            alert('Could not delete recipe.');
+          }
+        },
+      );
     }
   }
 }

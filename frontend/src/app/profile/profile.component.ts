@@ -9,16 +9,15 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.scss'
+  styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
-
   myRecipes: any[] = [];
 
   constructor(
     private recipeService: RecipeService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -28,19 +27,19 @@ export class ProfileComponent implements OnInit {
     }
 
     this.recipeService.getMyRecipes().subscribe({
-      next: data => this.myRecipes = data,
-      error: err => {
+      next: (data) => (this.myRecipes = data),
+      error: (err) => {
         console.error('Failed to load recipes:', err);
         if (err.status === 401 || err.status === 403) {
           this.router.navigate(['/login']);
         }
-      }
+      },
     });
   }
 
   deleteRecipe(id: number) {
     this.recipeService.deleteRecipe(id).subscribe(() => {
-      this.myRecipes = this.myRecipes.filter(r => r.id !== id);
+      this.myRecipes = this.myRecipes.filter((r) => r.id !== id);
     });
   }
 
@@ -70,22 +69,24 @@ export class ProfileComponent implements OnInit {
 
   private getDefaultImage(category: string): string {
     const defaults: Record<string, string> = {
-      SALAD: '/images/salad-svgrepo-com.svg',
-      SOUP: '/images/soup-svgrepo-com.svg',
-      APPETIZER: '/images/starter-svgrepo-com.svg',
-      MAIN: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      BREAKFAST: '/images/breakfast-svgrepo-com.svg',
+      LUNCH: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      DINNER: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      SNACK: '/images/snack-svgrepo-com.svg',
       DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
-      DRINK: '/images/drink-soft-drink-svgrepo-com.svg',
-      OTHER: '/images/oden-svgrepo-com.svg'
+      APPETIZER: '/images/starter-svgrepo-com.svg',
+      SIDE_DISH: '/images/side-dish-svgrepo-com.svg',
+      SOUP: '/images/soup-svgrepo-com.svg',
+      SALAD: '/images/salad-svgrepo-com.svg',
+      BEVERAGE: '/images/drink-soft-drink-svgrepo-com.svg',
     };
-    return defaults[category] || defaults['OTHER'];
+    return defaults[category] || '/images/oden-svgrepo-com.svg';
   }
 
   onLogout() {
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/login']),
-      error: () => this.router.navigate(['/login'])
+      error: () => this.router.navigate(['/login']),
     });
   }
-
 }
