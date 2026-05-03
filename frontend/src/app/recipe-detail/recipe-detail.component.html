@@ -148,9 +148,9 @@
         <h3 class="section-title">📎 Files</h3>
 
         <div *ngIf="recipe.pdf_file" class="pdf-link">
-          <a [href]="getPdfUrl(recipe.pdf_file)" target="_blank" class="pdf-btn">
+          <button type="button" (click)="openPdf()" class="pdf-btn">
             📄 View PDF Recipe
-          </a>
+          </button>
         </div>
 
         <div *ngIf="isEditing" class="file-inputs">

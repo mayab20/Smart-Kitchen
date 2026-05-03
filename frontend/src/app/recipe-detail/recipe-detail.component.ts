@@ -373,6 +373,37 @@ export class RecipeDetailComponent implements OnInit {
     this.ngOnInit();
   }
 
+  openPdf() {
+    const pdfPath = this.recipe?.pdf_file;
+
+    if (!pdfPath) {
+      return;
+    }
+
+    if (pdfPath.startsWith('data:')) {
+      const [metadata, base64Data] = pdfPath.split(',');
+      const contentType =
+        metadata.match(/data:(.*);base64/)?.[1] || 'application/pdf';
+
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+
+      const blob = new Blob([new Uint8Array(byteNumbers)], {
+        type: contentType,
+      });
+
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+      return;
+    }
+
+    window.open(this.getPdfUrl(pdfPath), '_blank');
+  }
+
   deleteRecipe() {
     if (confirm('Are you sure you want to delete this recipe?')) {
       this.recipeService.deleteRecipe(this.recipe.id).subscribe(
