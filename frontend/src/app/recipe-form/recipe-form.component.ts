@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RecipeService } from '../services/recipe.service';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,13 +14,17 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   templateUrl: './recipe-form.component.html',
   styleUrls: ['./recipe-form.component.scss'],
 })
-export class RecipeFormComponent implements OnInit {
+export class RecipeFormComponent implements OnDestroy, OnInit {
+  @ViewChild('imageInput') imageInput?: ElementRef<HTMLInputElement>;
+
   recipe: any = {
     title: '',
     description: '',
     category: 'BREAKFAST',
     pdf_file: null,
   };
+  selectedImageName = '';
+  selectedImagePreview = '';
 
   recipeCategories = [
     { value: 'BREAKFAST', label: 'Breakfast' },
@@ -71,18 +75,9 @@ export class RecipeFormComponent implements OnInit {
                 name: ri.ingredient_name,
                 quantity: ri.quantity,
                 unit: ri.unit,
-                allowed_units: [
-                  'g',
-                  'kg',
-                  'ml',
-                  'l',
-                  'cup',
-                  'tbsp',
-                  'tsp',
-                  'piece',
-                  'pinch',
-                  'slice',
-                ], // Default units
+                allowed_units: ri.allowed_units && ri.allowed_units.length > 0
+                  ? ri.allowed_units
+                  : ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'],
               }),
             );
           }
@@ -100,6 +95,10 @@ export class RecipeFormComponent implements OnInit {
         next: (data) => (this.suggestions = data),
         error: (err) => console.error('Search failed:', err),
       });
+  }
+
+  ngOnDestroy() {
+    this.clearImagePreviewUrl();
   }
 
   onSearchInput() {
@@ -152,6 +151,29 @@ export class RecipeFormComponent implements OnInit {
   onFileChange(event: any, field: string) {
     const file = event.target.files[0];
     this.recipe[field] = file;
+
+    if (field === 'image') {
+      this.clearImagePreviewUrl();
+      this.selectedImageName = file?.name || '';
+      this.selectedImagePreview = file ? URL.createObjectURL(file) : '';
+    }
+  }
+
+  removeImage() {
+    this.recipe.image = null;
+    this.selectedImageName = '';
+    this.clearImagePreviewUrl();
+
+    if (this.imageInput) {
+      this.imageInput.nativeElement.value = '';
+    }
+  }
+
+  private clearImagePreviewUrl() {
+    if (this.selectedImagePreview) {
+      URL.revokeObjectURL(this.selectedImagePreview);
+      this.selectedImagePreview = '';
+    }
   }
 
   submit() {

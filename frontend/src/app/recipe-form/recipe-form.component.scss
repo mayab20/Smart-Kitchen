@@ -78,6 +78,49 @@
   font-size: 2rem;
 }
 
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: var(--sk-space-3);
+  padding: var(--sk-space-3);
+  border: 1px solid var(--sk-border);
+  border-radius: var(--sk-radius-md);
+  background: var(--sk-surface);
+}
+
+.selected-image-preview {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--sk-radius-md);
+  border: 1px solid var(--sk-border);
+}
+
+.selected-file-details {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.selected-file-label {
+  color: var(--sk-text-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.selected-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 900;
+}
+
+.remove-file-btn {
+  min-height: 36px;
+  padding: 0 var(--sk-space-3);
+}
+
 .search-wrapper {
   position: relative;
 }

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { RecipeService } from '../services/recipe.service';
-import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -42,7 +41,6 @@ export class RecipeDetailComponent implements OnInit {
 
   constructor(
     private recipeService: RecipeService,
-    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}

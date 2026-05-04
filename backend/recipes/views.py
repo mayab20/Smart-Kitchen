@@ -5,10 +5,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.db.models import Prefetch
-
 from pantries.models import Pantry
 from .models import Recipe, RecipeIngredient
 from .serializers import RecipeSerializer
@@ -33,6 +32,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def _extract_ingredients_data(self, data):
         ingredients_data = data.get('ingredients_data', None)
+
         if ingredients_data is None:
             return None
 
@@ -52,6 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def _save_ingredients(self, recipe, ingredients_data):
         recipe.recipeingredient_set.all().delete()
+
         for item in ingredients_data or []:
             ingredient_id = item.get('ingredient')
             quantity = item.get('quantity', '')
@@ -64,22 +65,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     unit=unit
                 )
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         data = request.data.copy()
         ingredients_data = self._extract_ingredients_data(data)
-
         serializer = self.get_serializer(data=data)
+
         if not serializer.is_valid():
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         recipe = serializer.save(created_by=request.user if request.user.is_authenticated else None)
+
         if ingredients_data is not None:
             self._save_ingredients(recipe, ingredients_data)
 
         return Response(self.get_serializer(recipe).data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request,  **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         if instance.created_by_id != request.user.id:

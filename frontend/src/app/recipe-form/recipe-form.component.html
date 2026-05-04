@@ -88,6 +88,7 @@
             <label for="image">Recipe Image</label>
             <div class="file-input-wrapper">
               <input
+                #imageInput
                 id="image"
                 type="file"
                 (change)="onFileChange($event, 'image')"
@@ -98,6 +99,27 @@
                 <span class="file-icon">📷</span>
                 <span>Choose Image</span>
               </div>
+            </div>
+
+            <div *ngIf="selectedImageName" class="selected-file selected-image">
+              <img
+                *ngIf="selectedImagePreview"
+                [src]="selectedImagePreview"
+                [alt]="selectedImageName"
+                class="selected-image-preview"
+              />
+              <div class="selected-file-details">
+                <span class="selected-file-label">Selected image</span>
+                <span class="selected-file-name">{{ selectedImageName }}</span>
+              </div>
+              <button
+                type="button"
+                class="remove-file-btn"
+                (click)="removeImage()"
+                title="Remove image"
+              >
+                Remove
+              </button>
             </div>
           </div>
 

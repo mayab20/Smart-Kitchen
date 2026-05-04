@@ -122,7 +122,7 @@
           </div>
 
           <ul class="selected-ingredients">
-            <li *ngFor="let ing of selectedIngredients; let i = index" class="selected-item">
+            <li *ngFor="let ing of selectedIngredients" class="selected-item">
               <span class="ingredient-name">{{ing.name}}</span>
               <input type="text" [(ngModel)]="ing.quantity" placeholder="Quantity" class="quantity-input">
               <select [(ngModel)]="ing.unit" class="unit-select">

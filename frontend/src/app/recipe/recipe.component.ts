@@ -31,21 +31,10 @@ export class RecipesComponent implements OnInit {
     { value: 'BEVERAGE', label: 'Beverage' },
   ];
 
-  newRecipe: any = {
-    title: '',
-    description: '',
-    instructions: '',
-  };
-
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit() {
     this.loadRecipes();
-  }
-
-  onFileChange(event: any, field: string) {
-    const file = event.target.files[0];
-    this.newRecipe[field] = file;
   }
 
   loadRecipes() {
@@ -75,24 +64,6 @@ export class RecipesComponent implements OnInit {
           .includes(this.searchTitle.toLowerCase().trim());
 
       return matchesCategory && matchesTitle;
-    });
-  }
-
-  addRecipe() {
-    const formData = new FormData();
-
-    for (let key in this.newRecipe) {
-      formData.append(key, this.newRecipe[key]);
-    }
-
-    this.recipeService.addRecipe(formData).subscribe(() => {
-      this.loadRecipes();
-    });
-  }
-
-  deleteRecipe(id: number) {
-    this.recipeService.deleteRecipe(id).subscribe(() => {
-      this.loadRecipes();
     });
   }
 
