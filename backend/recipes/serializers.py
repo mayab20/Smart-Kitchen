@@ -66,13 +66,15 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         user = getattr(request, 'user', None)
         if not user or not user.is_authenticated:
             return None
-        filters = {
-            'user': user,
-            'item': obj.ingredient,
-        }
-        if obj.unit:
-            filters['unit__iexact'] = obj.unit
-        return Pantry.objects.filter(**filters).first()
+
+        pantry_qs = Pantry.objects.filter(user=user, item=obj.ingredient)
+        unit = (obj.unit or '').strip()
+        if unit:
+            pantry = pantry_qs.filter(unit__iexact=unit).first()
+            if pantry:
+                return pantry
+
+        return pantry_qs.filter(unit='').first() or pantry_qs.first()
 
     def _parse_quantity(self, value):
         if value is None:

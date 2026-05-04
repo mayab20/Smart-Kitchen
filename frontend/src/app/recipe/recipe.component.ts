@@ -127,8 +127,8 @@ export class RecipesComponent implements OnInit {
   private getDefaultImage(category: string): string {
     const defaults: Record<string, string> = {
       BREAKFAST: '/images/breakfast-svgrepo-com.svg',
-      LUNCH: '/images/bibimbub-cooking-food-svgrepo-com.svg',
-      DINNER: '/images/bibimbub-cooking-food-svgrepo-com.svg',
+      LUNCH: '/images/lunch-svgrepo-com.svg',
+      DINNER: '/images/dinner-svgrepo-com.svg',
       SNACK: '/images/snack-svgrepo-com.svg',
       DESSERT: '/images/dessert-food-and-restaurant-svgrepo-com.svg',
       APPETIZER: '/images/starter-svgrepo-com.svg',

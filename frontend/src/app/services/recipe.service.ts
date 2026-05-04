@@ -55,7 +55,7 @@ export class RecipeService {
   }
 
   getRecipe(id: number): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.apiUrl}${id}/`);
+    return this.http.get<Recipe>(`${this.apiUrl}${id}/`, this.authOptions);
   }
 
   addRecipe(data: FormData): Observable<Recipe> {
