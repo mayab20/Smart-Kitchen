@@ -1,8 +1,8 @@
 <div class="form-container">
   <div class="form-card">
     <div class="form-header">
-      <h2>{{ isEditMode ? '✏️ Edit Recipe' : '➕ Add New Recipe' }}</h2>
-      <p>{{ isEditMode ? 'Update your delicious recipe' : 'Share your culinary masterpiece with the world' }}</p>
+      <h2>➕ Add New Recipe</h2>
+      <p>Share your culinary masterpiece with the world</p>
     </div>
 
     <form class="recipe-form">
@@ -217,8 +217,8 @@
       <!-- Submit Button -->
       <div class="form-actions">
         <button type="button" class="submit-btn" (click)="submit()">
-          <span class="btn-icon">{{ isEditMode ? '💾' : '➕' }}</span>
-          {{ isEditMode ? 'Update Recipe' : 'Create Recipe' }}
+          <span class="btn-icon">➕</span>
+          Create Recipe
         </button>
       </div>
 

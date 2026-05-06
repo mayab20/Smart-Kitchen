@@ -9,7 +9,6 @@ import { ProfileComponent } from './profile/profile.component';
 export const routes = [
   { path: '', component: RecipesComponent },
   { path: 'add', component: RecipeFormComponent },
-  { path: 'edit/:id', component: RecipeFormComponent },
   { path: 'recipe/:id', component: RecipeDetailComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },

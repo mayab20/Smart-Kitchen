@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RecipeService } from '../services/recipe.service';
 import { AuthService } from '../services/auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -45,13 +45,9 @@ export class RecipeFormComponent implements OnDestroy, OnInit {
   showSuggestions = false;
   private searchSubject = new Subject<string>();
 
-  isEditMode = false;
-  recipeId: any;
-
   constructor(
     private recipeService: RecipeService,
     private authService: AuthService,
-    private route: ActivatedRoute,
     private router: Router,
   ) {
     if (!this.authService.isLoggedIn()) {
@@ -60,31 +56,6 @@ export class RecipeFormComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.recipeId = this.route.snapshot.params['id'];
-
-    if (this.recipeId) {
-      this.isEditMode = true;
-      this.recipeService.getRecipes().subscribe((data) => {
-        const found = data.find((r: any) => r.id == this.recipeId);
-        if (found) {
-          this.recipe = found;
-          if (found.recipe_ingredients) {
-            this.selectedIngredients = found.recipe_ingredients.map(
-              (ri: any) => ({
-                ingredient: ri.ingredient,
-                name: ri.ingredient_name,
-                quantity: ri.quantity,
-                unit: ri.unit,
-                allowed_units: ri.allowed_units && ri.allowed_units.length > 0
-                  ? ri.allowed_units
-                  : ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece', 'pinch', 'slice'],
-              }),
-            );
-          }
-        }
-      });
-    }
-
     this.searchSubject
       .pipe(
         debounceTime(300),
@@ -218,9 +189,7 @@ export class RecipeFormComponent implements OnDestroy, OnInit {
 
     formData.append('ingredients_data', JSON.stringify(ingredientPayload));
 
-    const request = this.isEditMode
-      ? this.recipeService.updateRecipe(this.recipeId, formData)
-      : this.recipeService.addRecipe(formData);
+    const request = this.recipeService.addRecipe(formData);
 
     request.subscribe(
       () => {
